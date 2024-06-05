@@ -23,9 +23,9 @@ p=0.15
 a=1
 delt=1
 dist=1
-iv=2
-ev=2
-its=10
+iv=3
+ev=3
+its=100
 rfilebase = "runv1n10"
 
 #Create Coupled Particle object (this object holds all simulation logic)
