@@ -6,7 +6,7 @@ See script.py for an example of usage. Data will be saved and stored inside a ne
 
 ###List of parameters (and default values)
 filebase (no default)         ##The directory in which all data is stored
-q=49													##Number of quantiles tracked (wrt Mahalanobis distance). q=49 means 2%-98% quantiles are recorded
+q=49                          ##Number of quantiles tracked (wrt Mahalanobis distance). q=49 means 2%-98% quantiles are recorded
 nl=3                          ##Number of upper/lower eigenvalues tracked
 m=12                          ##Number of i.i.d. samples taken
 N=12                          ##The number of particles in the mean-field reference process
