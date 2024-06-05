@@ -5,7 +5,7 @@ Single particle type CLSNA type model simulations coupled with mean field.
 See script.py for an example of usage. Data will be saved and stored inside a new directory in the simdata folder.\
 
 ###List of parameters (and default values)\
-filebase (no default)&emsp!&emsp!##The directory in which all data is stored\
+filebase (no default)         ##The directory in which all data is stored\
 q=49													##Number of quantiles tracked (wrt Mahalanobis distance). q=49 means 2%-98% quantiles are recorded\
 nl=3                          ##Number of upper/lower eigenvalues tracked
 m=12                          ##Number of i.i.d. samples taken
