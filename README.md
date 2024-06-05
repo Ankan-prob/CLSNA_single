@@ -23,11 +23,21 @@ d=2                           ##Number of dimensions of the latent space
 C=0.5                         ##Constant in link function (see iv/ev)
 p=0.15                        ##Constant in link function (see iv/ev)
 a=1                           ##Constant in link function (see iv/ev)
-delt=1                        ##Constant in link function (see iv/ev)
+delt=1                        ##Constant in link function (see ev)
 dist=1                        ##Constant in link function (see iv/ev)
 iv=2                          ##Choice of link function (at time 0):
                                       #iv=0: B_0(x,y) = p
                                       #iv=1: B_0(x,y) = exp(-C|x-y|)
                                       #iv=2: B_0(x,y) = exp(-C|x-y|^2)
                                       #iv=3: B_0(x,y) = logistic(a-C*|x-y|)
-ev=2
+                                      #iv=4: B_0(x,y) = 1_{|x-y|<dist}
+ev=2                          ##Choice of link function (at time > 0):
+                                      #ev=0: B(A,x,y) = p
+                                      #ev=1: B(A,x,y) = exp(delt*(A-1)-C|x-y|)
+                                      #ev=2: B(A,x,y) = exp(delt*(A-1)-C|x-y|^2)
+                                      #ev=3: B(A,x,y) = logistic(a+delt*A-C|x-y|)
+                                      #ev=4: B(A,x,y) = 1_{|x-y|<dist}
+                                      #ev=5: B(A,x,y) = 1_{|x-y|<dist,A=1}
+its=2                         ##Number of iterations to generate MF reference
+rfilebase=filebase            ##directory from which the MF reference is loaded. By default, the MF reference is generated locally.
+  d
