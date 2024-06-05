@@ -1,4 +1,6 @@
 # Ignore everything in this directory
 *
-# Except this file
+#Except txt files that outline parameters and filebases
+!*.txt
+# Also leave this file
 !.gitignore
