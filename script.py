@@ -10,6 +10,9 @@ import saveload as sl
 import animate as an
 
 #Set parameters
+q=49
+nl=3
+m=1000
 N=10000
 SS=10
 t0=1
@@ -26,7 +29,7 @@ dist=1
 iv=3
 ev=3
 its=100
-rfilebase = "runv1n10"
+rf = "runv1n10" #rf is the rfilebase parameter
 
 #Create Coupled Particle object (this object holds all simulation logic)
 cp = sm.CoupledParticle(N=N,SS=SS,t0=t0,noi=noi,n=n,T=T,gam=gam,d=d,C=C,p=p,a=a\
@@ -36,7 +39,10 @@ cp = sm.CoupledParticle(N=N,SS=SS,t0=t0,noi=noi,n=n,T=T,gam=gam,d=d,C=C,p=p,a=a\
 #cp = sm.CoupledParticle()
   
 #Generate a SimulateSaveLoad object (a wrapper class for generating/saving/loading data)
-Present = sl.SimulateSaveLoad("runv1n10",cp=cp,op=0,m=100)
+#op is a safety parameter.
+    #op=0: if safety checks fail, the program will return an error and do nothing
+    #op=1: if safety checks fail, the program will override the input parameters in favor of local parameters
+Present = sl.SimulateSaveLoad("runv1n10",rfilebase=rf,cp=cp,op=0,q=q,nl=nl,m=m)
 
 #Construct reference measure for MF computations if necessary
 #If not necessary, this will return a warning and do nothing
