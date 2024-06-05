@@ -46,7 +46,9 @@ Present.saveref()
 Present.saveCoupleGivenRef(Present.filebase)
 
 #Get the statistics from m runs of both simulations
-Present.savemCoupledStatistics(Present.filebase,DEBUG = True)
+#Optional argument: DEBUG (default: False)
+#DEBUG saves the full particle/network trajectories as well as the statistics. Only use with small parameters!
+Present.savemCoupledStatistics(Present.filebase,DEBUG = False)
 
 #Create an animation object
 ann = an.Animate(filebase = Present.filebase)
