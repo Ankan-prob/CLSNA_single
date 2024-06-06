@@ -25,17 +25,19 @@ class SimulateSaveLoad():
     #Options are not saved as parameters and can be changed at will
     def __init__(self,filebase,rfilebase=None,op=0,q=49,nl=3,m=12,cp=sm.CoupledParticle()):
         self.filebase = filebase
-        if rfilebase == None:
-            self.rfilebase = filebase
-        else:
-            self.rfilebase = rfilebase
-            self.checkrfilebase()
         self.q = q
         self.nl = nl
         self.m = m
         self.cp = cp
         self.pth = os.path.join("simdata",filebase)     #This is the path where data is saved
-        self.rfile = os.path.join("simdata",self.rfilebase)+"\\Ref.npy"
+        if rfilebase == None or rfilebase == filebase:
+            self.rfilebase = filebase
+            self.rfile = os.path.join("simdata",self.rfilebase)+"\\Ref.npy"
+        else:
+            self.rfilebase = rfilebase
+            self.rfile = os.path.join("simdata",self.rfilebase)+"\\Ref.npy"
+            self.checkrfilebase()
+        
         
         #Construct Lines of text outlining parameters
         st = ['']*21
@@ -93,7 +95,7 @@ class SimulateSaveLoad():
     
     #load a Coupled Particle object from a (possibly different) filebase
     def loadCPFromFilebase(self,filebase):
-        params = np.load(self.pth+"\\ParamArray.npy")
+        params = np.load(os.path.join("simdata",filebase)+"\\ParamArray.npy")
         q = int(params[0])
         nl = int(params[1])
         m = int(params[2])

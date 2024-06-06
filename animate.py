@@ -34,8 +34,8 @@ class Animate():
         (At,Zt,AMFt,ZMFt) = self.ssl.loadCoupled()
         
         #Get the maximal bounds of the plot
-        maxlim = np.ceil(np.max(np.abs(Zt[:,0,:]))/10)*10
-        maxlimMF = np.ceil(np.max(np.abs(ZMFt[:,0,:]))/10)*10
+        maxlim = np.ceil(np.max(np.abs(Zt[:,:,:]))/10)*10
+        maxlimMF = np.ceil(np.max(np.abs(ZMFt[:,:,:]))/10)*10
 
         ##Create figure and axes for animation
         fig, axes = plt.subplots(1,2,layout = 'constrained')
@@ -98,8 +98,8 @@ class Animate():
         (At,Zt,AMFt,ZMFt) = self.ssl.loadCoupled()
         
         #Get the maximal bounds of the plot
-        maxlim = np.ceil(np.max(np.abs(Zt[:,0,:]))/10)*10
-        maxlimMF = np.ceil(np.max(np.abs(ZMFt[:,0,:]))/10)*10
+        maxlim = np.ceil(np.max(np.abs(Zt[:,:,:]))/10)*10
+        maxlimMF = np.ceil(np.max(np.abs(ZMFt[:,:,:]))/10)*10
 
         ##Create figure and axes for animation
         fig, axes = plt.subplots(1,2,layout = 'constrained')
@@ -162,8 +162,8 @@ class Animate():
         (At,Zt,AMFt,ZMFt) = self.ssl.loadCoupled()
         
         #Get the maximal bounds of the plot
-        maxlim = np.ceil(np.max(np.abs(Zt[:,0,:]))/10)*10
-        maxlimMF = np.ceil(np.max(np.abs(ZMFt[:,0,:]))/10)*10
+        maxlim = np.ceil(np.max(np.abs(Zt[:,:,:]))/10)*10
+        maxlimMF = np.ceil(np.max(np.abs(ZMFt[:,:,:]))/10)*10
 
         ##Create figure and axes for animation
         fig, axes = plt.subplots(1,2,layout = 'constrained')
@@ -238,7 +238,7 @@ class Animate():
         
         #Create another animation writer
         metadata = dict(title = 'Sample Particles', artist = 'Ankan Ganguly')
-        writer = FFMpegWriter(fps = 2, metadata = metadata)
+        writer = FFMpegWriter(fps = 0.75, metadata = metadata)
 
         #Define bounds
         bds = np.ceil(max(np.max(np.abs(Zt)),np.max(np.abs(ZMFt)))/4)*4
@@ -365,7 +365,7 @@ class Animate():
         
         #Create another animation writer
         metadata = dict(title = 'Sample Subnetwork', artist = 'Ankan Ganguly')
-        writer = FFMpegWriter(fps = 2, metadata = metadata)
+        writer = FFMpegWriter(fps = 0.75, metadata = metadata)
 
         with writer.saving(fig, self.ssl.pth + "\\subnetworksample.mp4", 100):
             for t in np.arange(TT):
@@ -449,7 +449,7 @@ class Animate():
         
         #Create another animation writer
         metadata = dict(title = 'Sample Particles with Network', artist = 'Ankan Ganguly')
-        writer = FFMpegWriter(fps = 2, metadata = metadata)
+        writer = FFMpegWriter(fps = 0.75, metadata = metadata)
 
         #Define bounds
         bds = np.ceil(max(np.max(np.abs(Zt)),np.max(np.abs(ZMFt)))/4)*4
