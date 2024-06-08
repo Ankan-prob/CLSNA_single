@@ -11,7 +11,7 @@ import animate as an
 #Set parameters
 q=49
 nl=3
-m=200
+m=1000
 N=2000
 SS=10
 t0=1
@@ -38,7 +38,7 @@ cp = sm.CoupledParticle(N=N,SS=SS,t0=t0,noi=noi,n=n,T=T,gam=gam,d=d,C=C,p=p,a=a\
 #op is a safety parameter.
     #op=0: if safety checks fail, the program will return an error and do nothing
     #op=1: if safety checks fail, the program will override the input parameters in favor of local parameters
-Present = sl.SimulateSaveLoad("testparams9",rfilebase=rf,cp=cp,op=0,q=q,nl=nl,m=m)
+Present = sl.SimulateSaveLoad("testparams12",rfilebase=rf,cp=cp,op=0,q=q,nl=nl,m=m)
 
 #Construct reference measure for MF computations if necessary
 #If not necessary, this will return a warning and do nothing

@@ -657,9 +657,9 @@ class CoupledParticle(MFParticle):
                 A = At[t]
                 A.setdiag(0)
                 de[t,i] = A.sum()/(self.n**2)
-                Asc = sp.sparse.linalg.matrix_power(A,3)
+                Asb = A.multiply(A)
+                Asc = Asb.multiply(A)
                 tde[t,i] = Asc.trace()/(self.n**3)
-                Asb = sp.sparse.linalg.matrix_power(A,2)
                 cl[t,i] = tde[t,i]*(self.n**3)/(Asb.sum()-Asb.trace())
                 eigs = sp.sparse.linalg.eigsh(A.asfptype(),k=6,which = 'BE',return_eigenvectors = False)
                 se[:,t,i]= eigs[0:nl]
@@ -668,9 +668,9 @@ class CoupledParticle(MFParticle):
                 AMF = AMFt[t]
                 AMF.setdiag(0)
                 deMF[t,i] = AMF.sum()/(self.n**2)
-                AMFsc = sp.sparse.linalg.matrix_power(AMF,3)
+                AMFsb = AMF.multiply(AMF)
+                AMFsc = AMFsb.multiply(AMF)
                 tdeMF[t,i] = AMFsc.trace()/(self.n**3)
-                AMFsb = sp.sparse.linalg.matrix_power(AMF,2)
                 clMF[t,i] = tdeMF[t,i]*(self.n**3)/(AMFsb.sum()-AMFsb.trace())
                 eigsMF = sp.sparse.linalg.eigsh(AMF.asfptype(),k=6,which = 'BE',return_eigenvectors = False)
                 seMF[:,t,i]= eigsMF[0:nl]
