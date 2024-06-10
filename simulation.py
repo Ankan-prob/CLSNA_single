@@ -570,6 +570,7 @@ class CoupledParticle(MFParticle):
         quaMF = np.zeros((q,self.T,m))
         maMF = np.zeros((self.T,m))
         miMF = np.zeros((self.T,m))
+        mse = np.zeros((self.T,m))
         
         #Network statistics
             #de = density
@@ -640,6 +641,9 @@ class CoupledParticle(MFParticle):
             mamMF = np.max(MahazMF,axis = 0)
             mimMF = np.min(MahazMF,axis = 0)
             
+            #Get the MSE
+            msem = np.mean((Zt[0,:,:]-ZMFt[0,:,:])**2 + (Zt[1,:,:]-ZMFt[1,:,:])**2,axis=0)
+            
             #Store these results
             sm[:,:,i] = mm                      
             sc[:,:,:,i] = cm
@@ -651,6 +655,7 @@ class CoupledParticle(MFParticle):
             quaMF[:,:,i] = quamMF
             maMF[:,i] = mamMF
             miMF[:,i] = mimMF
+            mse[:,i] = msem
             
             #Calculate A statistics
             for t in np.arange(self.T):
@@ -683,5 +688,5 @@ class CoupledParticle(MFParticle):
             return (sm,sc,qua,ma,mi,smMF,scMF,quaMF,maMF,miMF,de,tde,cl,\
                     le,se,deMF,tdeMF,clMF,leMF,seMF,Atm,Ztm,AtmMF,ZtmMF)
         else:
-            return (sm,sc,qua,ma,mi,smMF,scMF,quaMF,maMF,miMF,de,tde,cl,\
+            return (sm,sc,qua,ma,mi,smMF,scMF,quaMF,maMF,miMF,mse,de,tde,cl,\
                     le,se,deMF,tdeMF,clMF,leMF,seMF)

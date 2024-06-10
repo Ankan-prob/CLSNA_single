@@ -330,16 +330,17 @@ class SimulateSaveLoad():
         #Save all z statistics
         np.savez(self.pth+"\\zstats.npz",sm=dat[0],sc=dat[1]\
                  ,qua=dat[2],ma=dat[3],mi=dat[4],smMF=dat[5]\
-                 ,scMF=dat[6],quaMF=dat[7],maMF=dat[8],miMF=dat[9])
+                 ,scMF=dat[6],quaMF=dat[7],maMF=dat[8],miMF=dat[9]\
+                 ,mse = dat[10])
             
         #Save all A statistics
-        np.savez(self.pth+"\\astats.npz",de=dat[10],tde=dat[11]\
-                 ,cl=dat[12],le=dat[13],se=dat[14],deMF=dat[15]\
-                 ,tdeMF=dat[16],clMF=dat[17],leMF=dat[18],seMF=dat[19])
+        np.savez(self.pth+"\\astats.npz",de=dat[11],tde=dat[12]\
+                 ,cl=dat[13],le=dat[14],se=dat[15],deMF=dat[16]\
+                 ,tdeMF=dat[17],clMF=dat[18],leMF=dat[19],seMF=dat[20])
         
         if DEBUG:
-            np.savez(self.pth + "\\statsDEBUG.npz",at=dat[20],zt=dat[21]\
-                     ,atMF=dat[22],ztMF=dat[23])
+            np.savez(self.pth + "\\statsDEBUG.npz",at=dat[21],zt=dat[22]\
+                     ,atMF=dat[23],ztMF=dat[24])
         return
     
     #load the z statistics
@@ -358,8 +359,9 @@ class SimulateSaveLoad():
             quaMF = dat['quaMF']
             maMF = dat['maMF']
             miMF = dat['miMF']
+            mse = dat['mse']
         
-        return (sm,sc,qua,ma,mi,smMF,scMF,quaMF,maMF,miMF)
+        return (sm,sc,qua,ma,mi,smMF,scMF,quaMF,maMF,miMF,mse)
     
     #load the a statistics
     def loadmCoupledAStatistics(self, op = 0):

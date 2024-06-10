@@ -63,7 +63,7 @@ class Animate():
         #axes[1].legend()
 
         #Create animation writer
-        metadata = dict(title = 'A red particle in a point cloud', artist = 'Ankan Ganguly')
+        metadata = dict(title = 'Point Cloud', artist = 'Ankan Ganguly')
         writer = FFMpegWriter(fps = 15, metadata = metadata)
         
         with writer.saving(fig, self.ssl.pth + "\\pointcloud.mp4", 100):
@@ -82,10 +82,9 @@ class Animate():
                 
                 #Add frame to mp4 file
                 writer.grab_frame()
-            
-        #Create another animation writer
-        metadata = dict(title = 'Point Cloud', artist = 'Ankan Ganguly')
-        writer = FFMpegWriter(fps = 15, metadata = metadata)
+        
+        #Close plot
+        plt.close('all')
 
     #Construct an animation of the particle cloud with center of mass and random particle
     def CoupledParticleCloudBR(self):
@@ -127,7 +126,7 @@ class Animate():
         #axes[1].legend()
 
         #Create animation writer
-        metadata = dict(title = 'A red particle in a point cloud', artist = 'Ankan Ganguly')
+        metadata = dict(title = 'A red particle in a point cloud with mean', artist = 'Ankan Ganguly')
         writer = FFMpegWriter(fps = 15, metadata = metadata)
         
         with writer.saving(fig, self.ssl.pth + "\\pointcloudBR.mp4", 100):
@@ -146,10 +145,9 @@ class Animate():
                 
                 #Add frame to mp4 file
                 writer.grab_frame()
-            
-        #Create another animation writer
-        metadata = dict(title = 'Point Cloud', artist = 'Ankan Ganguly')
-        writer = FFMpegWriter(fps = 15, metadata = metadata)
+                
+        #Close plot
+        plt.close('all')
         
     #Construct an animation of the particle cloud with center of mass and random particle
     def CoupledParticleCloudR(self):
@@ -210,10 +208,9 @@ class Animate():
                 
                 #Add frame to mp4 file
                 writer.grab_frame()
-            
-        #Create another animation writer
-        metadata = dict(title = 'Point Cloud', artist = 'Ankan Ganguly')
-        writer = FFMpegWriter(fps = 15, metadata = metadata)
+                
+        #Close plot
+        plt.close('all')
         
     #Get an animation of Particles (given TT = animation time < T)
     def AnimateParticleSample(self,TT = None):
@@ -319,6 +316,9 @@ class Animate():
                 #Add to animation
                 writer.grab_frame()
                 
+        #close plots
+        plt.close('all')
+            
     #Get an animation of Network
     def AnimateSubNetwork(self, TT = None):
         #set input default value of TT to be the time of the simulation
@@ -425,6 +425,9 @@ class Animate():
 
                 #Add to animation
                 writer.grab_frame()
+                
+        #close plots
+        plt.close('all')
         
     #Get an animation of Particles (given TT = animation time < T)
     def AnimateParticleNetworkSample(self,TT=None):
@@ -533,3 +536,6 @@ class Animate():
 
                 #Add to animation
                 writer.grab_frame()
+                
+        #close plots
+        plt.close('all')
