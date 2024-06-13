@@ -660,10 +660,11 @@ class CoupledParticle(MFParticle):
             #Calculate A statistics
             for t in np.arange(self.T):
                 A = At[t]
+                A = A.astype(int)
                 A.setdiag(0)
                 de[t,i] = A.sum()/(self.n**2)
-                Asb = A.multiply(A)
-                Asc = Asb.multiply(A)
+                Asb = A @ A
+                Asc = Asb @ A
                 tde[t,i] = Asc.trace()/(self.n**3)
                 cl[t,i] = tde[t,i]*(self.n**3)/(Asb.sum()-Asb.trace())
                 eigs = sp.sparse.linalg.eigsh(A.asfptype(),k=6,which = 'BE',return_eigenvectors = False)
@@ -671,10 +672,11 @@ class CoupledParticle(MFParticle):
                 le[:,t,i] = eigs[nl:2*nl]
                 
                 AMF = AMFt[t]
+                AMF = AMF.astype(int)
                 AMF.setdiag(0)
                 deMF[t,i] = AMF.sum()/(self.n**2)
-                AMFsb = AMF.multiply(AMF)
-                AMFsc = AMFsb.multiply(AMF)
+                AMFsb = AMF @ AMF
+                AMFsc = AMFsb @ AMF
                 tdeMF[t,i] = AMFsc.trace()/(self.n**3)
                 clMF[t,i] = tdeMF[t,i]*(self.n**3)/(AMFsb.sum()-AMFsb.trace())
                 eigsMF = sp.sparse.linalg.eigsh(AMF.asfptype(),k=6,which = 'BE',return_eigenvectors = False)
