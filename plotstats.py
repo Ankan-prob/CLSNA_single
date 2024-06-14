@@ -9,6 +9,7 @@ import saveload as sl
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import scipy.stats as stats
 
 ##################Load statistics
 filebase1 = "runwnv210"
@@ -81,6 +82,23 @@ mse4 = sm4[10]
 mse5 = sm5[10]
 mse6 = sm6[10]
 mse7 = sm7[10]
+
+#load quantiles
+qua1 = sm1[2]
+qua2 = sm2[2]
+qua3 = sm3[2]
+qua4 = sm4[2]
+qua5 = sm5[2]
+qua6 = sm6[2]
+qua7 = sm7[2]
+
+quaMF1 = sm1[7]
+quaMF2 = sm2[7]
+quaMF3 = sm3[7]
+quaMF4 = sm4[7]
+quaMF5 = sm5[7]
+quaMF6 = sm6[7]
+quaMF7 = sm7[7]
 
 #load graph densities
 de1 = am1[0]
@@ -657,3 +675,80 @@ axes.plot(msleMF7, color = 'black', label = 'MF')
 
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+###############QQ Plots
+
+#Get quantiles at time T
+mqua1 = np.flatten(qua1[:,ssl1.cp.T-1,:],axis = 1)
+mqua2 = qua2[:,ssl2.cp.T-1,:]
+mqua3 = qua3[:,ssl3.cp.T-1,:]
+mqua4 = qua4[:,ssl4.cp.T-1,:]
+mqua5 = qua5[:,ssl5.cp.T-1,:]
+mqua6 = qua6[:,ssl6.cp.T-1,:]
+mqua7 = qua7[:,ssl7.cp.T-1,:]
+
+mquaMF1 = quaMF1[:,ssl1.cp.T-1,:]
+mquaMF2 = quaMF2[:,ssl2.cp.T-1,:]
+mquaMF3 = quaMF3[:,ssl3.cp.T-1,:]
+mquaMF4 = quaMF4[:,ssl4.cp.T-1,:]
+mquaMF5 = quaMF5[:,ssl5.cp.T-1,:]
+mquaMF6 = quaMF6[:,ssl6.cp.T-1,:]
+mquaMF7 = quaMF7[:,ssl7.cp.T-1,:]
+
+mxm1 = np.max(mqua1)
+mxm2 = np.max(mqua2)
+mxm3 = np.max(mqua3)
+mxm4 = np.max(mqua4)
+mxm5 = np.max(mqua5)
+mxm6 = np.max(mqua6)
+mxm7 = np.max(mqua7)
+
+mxmMF1 = np.max(mquaMF1)
+mxmMF2 = np.max(mquaMF2)
+mxmMF3 = np.max(mquaMF3)
+mxmMF4 = np.max(mquaMF4)
+mxmMF5 = np.max(mquaMF5)
+mxmMF6 = np.max(mquaMF6)
+mxmMF7 = np.max(mquaMF7)
+
+mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
+mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
+mxlimT = max(mxlim,mxlimMF)
+
+#Max quantile and actual quantiles
+mxqua = np.ceil(stats.chi2.ppf(q=0.98,df=2))
+quas = stats.chi2.ppf(q=np.arange(0.02,1,0.02),df=2)
+
+i=0
+for n in [10,20,50,100,200,500,1000]:
+    ##Create figure and axes for animation
+    fig, axes = plt.subplots()
+    
+    #Create axes
+    axes.set_xlim(0,mxqua)
+    axes.set_ylim(0,mxlimT)
+    axes.set_xlabel("chi2 quantiles")
+    axes.set_ylabel("sample quantiles")
+    
+    #Add title
+    axes.set_title("Mahalanobis QQ Plot: n = "+str(n))
+    
+    #Initialize line graphs
+    axes.scatter(quas, mqua1, c='b',s=5)
+    
+    ##Create figure and axes for animation
+    fig, axes = plt.subplots()
+    
+    #Create axes
+    axes.set_xlim(0,mxqua)
+    axes.set_ylim(0,mxlimT)
+    axes.set_xlabel("chi2 quantiles")
+    axes.set_ylabel("sample quantiles")
+    
+    #Add title
+    axes.set_title("Mahalanobis QQ Plot (Mean Field): n = "+str(n))
+    
+    #Initialize line graphs
+    axes.scatter(quas, mquaMF1[:,i], c='b',s=5)
+    
+    i=i+1
