@@ -164,6 +164,22 @@ sleMF5 = am5[8][1,:,:]
 sleMF6 = am6[8][1,:,:]
 sleMF7 = am7[8][1,:,:]
 
+#load third largest eigenvalues
+tle1 = am1[3][0,:,:]
+tle2 = am2[3][0,:,:]
+tle3 = am3[3][0,:,:]
+tle4 = am4[3][0,:,:]
+tle5 = am5[3][0,:,:]
+tle6 = am6[3][0,:,:]
+tle7 = am7[3][0,:,:]
+tleMF1 = am1[8][0,:,:]
+tleMF2 = am2[8][0,:,:]
+tleMF3 = am3[8][0,:,:]
+tleMF4 = am4[8][0,:,:]
+tleMF5 = am5[8][0,:,:]
+tleMF6 = am6[8][0,:,:]
+tleMF7 = am7[8][0,:,:]
+
 #load smallest eigenvalues
 se1 = am1[4][0,:,:]
 se2 = am2[4][0,:,:]
@@ -196,72 +212,106 @@ sseMF5 = am5[9][1,:,:]
 sseMF6 = am6[9][1,:,:]
 sseMF7 = am7[9][1,:,:]
 
-
+#load third smallest eigenvalues
+ste1 = am1[4][2,:,:]
+ste2 = am2[4][2,:,:]
+ste3 = am3[4][2,:,:]
+ste4 = am4[4][2,:,:]
+ste5 = am5[4][2,:,:]
+ste6 = am6[4][2,:,:]
+ste7 = am7[4][2,:,:]
+steMF1 = am1[9][2,:,:]
+steMF2 = am2[9][2,:,:]
+steMF3 = am3[9][2,:,:]
+steMF4 = am4[9][2,:,:]
+steMF5 = am5[9][2,:,:]
+steMF6 = am6[9][2,:,:]
+steMF7 = am7[9][2,:,:]
 
 ############Plot Means
 
 #ml1=0
-ml1 = np.max(np.abs(np.mean(smp1[0,:,:],axis=1)))*np.sqrt(1000.0*1000.0)
-mlMF1 = np.max(np.abs(np.mean(smMF1[0,:,:],axis=1)))*np.sqrt(2000)
+msm1 = np.mean(smp1[0,:,:],axis=1)*np.sqrt(10.0*100.0)
+msm2 = np.mean(smp2[0,:,:],axis=1)*np.sqrt(20.0*100.0)
+msm3 = np.mean(smp3[0,:,:],axis=1)*np.sqrt(50.0*100.0)
+msm4 = np.mean(smp4[0,:,:],axis=1)*np.sqrt(100.0*100.0)
+msm5 = np.mean(smp5[0,:,:],axis=1)*np.sqrt(200.0*100.0)
+msm6 = np.mean(smp6[0,:,:],axis=1)*np.sqrt(500.0*100.0)
+msm7 = np.mean(smp7[0,:,:],axis=1)*np.sqrt(1000.0*100.0)
+msmMF1 = np.mean(smMF1[0,:,:],axis=1)*np.sqrt(10.0*100.0)
+msmMF2 = np.mean(smMF2[0,:,:],axis=1)*np.sqrt(20.0*100.0)
+msmMF3 = np.mean(smMF3[0,:,:],axis=1)*np.sqrt(50.0*100.0)
+msmMF4 = np.mean(smMF4[0,:,:],axis=1)*np.sqrt(100.0*100.0)
+msmMF5 = np.mean(smMF5[0,:,:],axis=1)*np.sqrt(200.0*100.0)
+msmMF6 = np.mean(smMF6[0,:,:],axis=1)*np.sqrt(500.0*100.0)
+msmMF7 = np.mean(smMF7[0,:,:],axis=1)*np.sqrt(1000.0*100.0)
 
-#ml2=0
-ml2 = np.max(np.abs(np.mean(smp2[0,:,:],axis=1)))*np.sqrt(500.0*1000.0)
-#mlMF2 = np.max(np.abs(np.mean(smMF2[0,:,:],axis=1)))*np.sqrt(2000)
-mlMF2=0
+#plot bounds
+mxm1 = np.max(np.abs(msm1))
+mxm2 = np.max(np.abs(msm2))
+mxm3 = np.max(np.abs(msm3))
+mxm4 = np.max(np.abs(msm4))
+mxm5 = np.max(np.abs(msm5))
+mxm6 = np.max(np.abs(msm6))
+mxm7 = np.max(np.abs(msm7))
 
-#ml3=0
-ml3 = np.max(np.abs(np.mean(smp3[0,:,:],axis=1)))*np.sqrt(200.0*1000.0)
-#mlMF3 = np.max(np.abs(np.mean(smMF3[0,:,:],axis=1)))*np.sqrt(2000)
-mlMF3=0
+mxmMF1 = np.max(np.abs(msmMF1))
+mxmMF2 = np.max(np.abs(msmMF2))
+mxmMF3 = np.max(np.abs(msmMF3))
+mxmMF4 = np.max(np.abs(msmMF4))
+mxmMF5 = np.max(np.abs(msmMF5))
+mxmMF6 = np.max(np.abs(msmMF6))
+mxmMF7 = np.max(np.abs(msmMF7))
 
-#ml4=0
-ml4 = np.max(np.abs(np.mean(smp4[0,:,:],axis=1)))*np.sqrt(100.0*1000.0)
-#mlMF4 = np.max(np.abs(np.mean(smMF4[0,:,:],axis=1)))*np.sqrt(2000)
-mlMF4=0
+mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
+mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
+mxlimT = max(mxlim,mxmMF7)
 
-#ml5=0
-ml5 = np.max(np.abs(np.mean(smp5[0,:,:],axis=1)))*np.sqrt(50.0*1000.0)
-#mlMF5 = np.max(np.abs(np.mean(smMF5[0,:,:],axis=1)))*np.sqrt(2000)
-mlMF5=0
-
-#ml6=0
-ml6 = np.max(np.abs(np.mean(smp6[0,:,:],axis=1)))*np.sqrt(20.0*1000.0)
-#mlMF6 = np.max(np.abs(np.mean(smMF6[0,:,:],axis=1)))*np.sqrt(2000)
-mlMF6=0
-
-#ml7=0
-ml7 = np.max(np.abs(np.mean(smp7[0,:,:],axis=1)))*np.sqrt(10.0*1000.0)
-#mlMF7 = np.max(np.abs(np.mean(smMF7[0,:,:],axis=1)))*np.sqrt(2000)
-mlMF7=0
-
-mxlim = max(ml1,mlMF1,ml2,mlMF2,ml3,mlMF3,ml4,mlMF4,ml5,mlMF5,ml6,mlMF6,ml7,mlMF7)
-
-##Create figure and axes for animation
+##Create figure and axes for MF mean x coord simulations
 fig, axes = plt.subplots()
 
 #Create axes
 axes.set_xlim(0,101)
-axes.set_ylim(-mxlim,mxlim)
+axes.set_ylim(-mxlimMF,mxlimMF)
 axes.set_xlabel("Time")
-axes.set_ylabel("Mean x coordinate")
+axes.set_ylabel("Mean x coordinate*sqrt(nm)")
 
 #Add title
-axes.set_title("Mean x coordinates of particles")
+axes.set_title("Mean (sqrt(nm) normalized) x coordinates of MF particles")
 
 #Initialize line graphs
-axes.plot(np.mean(smMF1[0,:,:]*np.sqrt(2000),axis=1), color = 'black',label = 'MF')
-#axes.plot(np.mean(smMF2[0,:,:],axis=1), color = 'red')
-#axes.plot(np.mean(smMF3[0,:,:],axis=1), color = 'blue')
-#axes.plot(np.mean(smMF4[0,:,:],axis=1), color = 'green')
-#axes.plot(np.mean(smMF5[0,:,:],axis=1), color = 'yellow')
-#axes.plot(np.mean(smMF6[0,:,:],axis=1), color = 'orange')
-axes.plot(np.mean(smp1[0,:,:]*np.sqrt(1000.0*100.0),axis=1), color = 'red',label = 'n=1000')
-axes.plot(np.mean(smp2[0,:,:]*np.sqrt(500.0*100.0),axis=1), color = 'blue',label = 'n=500')
-axes.plot(np.mean(smp3[0,:,:]*np.sqrt(200.0*100.0),axis=1), color = 'green',label = 'n=200')
-axes.plot(np.mean(smp4[0,:,:]*np.sqrt(100.0*100.0),axis=1), color = 'yellow',label = 'n=100')
-axes.plot(np.mean(smp5[0,:,:]*np.sqrt(50.0*100.0),axis=1), color = 'orange',label = 'n=50')
-axes.plot(np.mean(smp6[0,:,:]*np.sqrt(20.0*100.0),axis=1), color = 'purple',label = 'n=20')
-axes.plot(np.mean(smp7[0,:,:]*np.sqrt(10.0*100.0),axis=1), color = 'black', linestyle = '--',label = 'n=10')
+axes.plot(msmMF1, color = 'black',label = 'n=10')
+axes.plot(msmMF2, color = 'red',label = 'n=20')
+axes.plot(msmMF3, color = 'blue',label = 'n=50')
+axes.plot(msmMF4, color = 'green',label = 'n=100')
+axes.plot(msmMF5, color = 'yellow',label = 'n=200')
+axes.plot(msmMF6, color = 'orange',label = 'n=500')
+axes.plot(msmMF7, color = 'purple',label = 'n=1000')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+##Create figure and axes for MF mean x coord simulations
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(-mxlimT,mxlimT)
+axes.set_xlabel("Time")
+axes.set_ylabel("Mean x coordinate*sqrt(nm)")
+
+#Add title
+axes.set_title("Mean (sqrt(nm) normalized) x coordinates particles")
+
+#Initialize line graphs
+axes.plot(msm1, color = 'black', linestyle = '--', label = 'n=10')
+axes.plot(msm2, color = 'red',label = 'n=20')
+axes.plot(msm3, color = 'blue',label = 'n=50')
+axes.plot(msm4, color = 'green',label = 'n=100')
+axes.plot(msm5, color = 'yellow',label = 'n=200')
+axes.plot(msm6, color = 'orange',label = 'n=500')
+axes.plot(msm7, color = 'purple', label = 'n=1000')
+axes.plot(msmMF7, color = 'black', label = 'MF (n=1000)')
 
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
@@ -535,7 +585,7 @@ fig, axes = plt.subplots()
 
 #Create axes
 axes.set_xlim(0,101)
-axes.set_ylim(-mxlimMF,mxlimMF)
+axes.set_ylim(0,mxlimMF)
 axes.set_xlabel("Time")
 axes.set_ylabel("Average Largest Eigenvalue")
 
@@ -563,7 +613,7 @@ fig, axes = plt.subplots()
 
 #Create axes
 axes.set_xlim(0,101)
-axes.set_ylim(-mxlimT,mxlimT)
+axes.set_ylim(0,mxlimT)
 axes.set_xlabel("Time")
 axes.set_ylabel("Average Largest Eigenvalue")
 
@@ -628,7 +678,7 @@ fig, axes = plt.subplots()
 
 #Create axes
 axes.set_xlim(0,101)
-axes.set_ylim(-mxlimMF, mxlimMF)
+axes.set_ylim(0, mxlimMF)
 axes.set_xlabel("Time")
 axes.set_ylabel("Average Second Largest Eigenvalue")
 
@@ -655,7 +705,7 @@ fig, axes = plt.subplots()
 
 #Create axes
 axes.set_xlim(0,101)
-axes.set_ylim(-mxlimT,mxlimT)
+axes.set_ylim(0,mxlimT)
 axes.set_xlabel("Time")
 axes.set_ylabel("Average Second Largest Eigenvalue")
 
@@ -671,6 +721,98 @@ axes.plot(msle5, color = 'yellow', label = 'n=200')
 axes.plot(msle6, color = 'orange', label = 'n=500')
 axes.plot(msle7, color = 'purple', label = 'n=1000')
 axes.plot(msleMF7, color = 'black', label = 'MF')
+#axes.plot(mdeMF7**3, color = 'red', linestyle = ':',label = 'Erdos Renyi', linewidth = 2)
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#########Third Largest eigenvalue plot
+
+#Get the second largest eigenvalue bounds
+mtle1 = np.mean(tle1,1)/10
+mtle2 = np.mean(tle2,1)/20
+mtle3 = np.mean(tle3,1)/50
+mtle4 = np.mean(tle4,1)/100
+mtle5 = np.mean(tle5,1)/200
+mtle6 = np.mean(tle6,1)/500
+mtle7 = np.mean(tle7,1)/1000
+
+mtleMF1 = np.mean(tleMF1,1)/10
+mtleMF2 = np.mean(tleMF2,1)/20
+mtleMF3 = np.mean(tleMF3,1)/50
+mtleMF4 = np.mean(tleMF4,1)/100
+mtleMF5 = np.mean(tleMF5,1)/200
+mtleMF6 = np.mean(tleMF6,1)/500
+mtleMF7 = np.mean(tleMF7,1)/1000
+
+mxm1 = np.max(np.abs(mtle1))
+mxm2 = np.max(np.abs(mtle2))
+mxm3 = np.max(np.abs(mtle3))
+mxm4 = np.max(np.abs(mtle4))
+mxm5 = np.max(np.abs(mtle5))
+mxm6 = np.max(np.abs(mtle6))
+mxm7 = np.max(np.abs(mtle7))
+
+mxmMF1 = np.max(np.abs(mtleMF1))
+mxmMF2 = np.max(np.abs(mtleMF2))
+mxmMF3 = np.max(np.abs(mtleMF3))
+mxmMF4 = np.max(np.abs(mtleMF4))
+mxmMF5 = np.max(np.abs(mtleMF5))
+mxmMF6 = np.max(np.abs(mtleMF6))
+mxmMF7 = np.max(np.abs(mtleMF7))
+
+mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
+mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
+mxlimT = max(mxlim,mxlimMF)
+
+##Create figure and axes for animation
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(0, mxlimMF)
+axes.set_xlabel("Time")
+axes.set_ylabel("Average Third Largest Eigenvalue")
+
+#Add title
+axes.set_title("Average Third Largest Eigenvalue of the MF Simulation")
+
+#Initialize line graphs
+axes.plot(mtleMF1, color = 'black', label = 'n=10', linestyle = '--')
+axes.plot(mtleMF2, color = 'red', label = 'n=20')
+axes.plot(mtleMF3, color = 'blue', label = 'n=50')
+axes.plot(mtleMF4, color = 'green', label = 'n=100')
+axes.plot(mtleMF5, color = 'yellow', label = 'n=200')
+axes.plot(mtleMF6, color = 'orange', label = 'n=500')
+axes.plot(mtleMF7, color = 'purple', label = 'n=1000')
+#axes.plot(mtdeMF7, color = 'black', label = 'MF')
+#axes.plot(mdeMF7**3, color = 'red', linestyle = ':',label = 'Erdos Renyi', linewidth = 2)
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#########Second Largest eigenvalue plots
+##Create figure and axes for animation
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(0,mxlimT)
+axes.set_xlabel("Time")
+axes.set_ylabel("Average Second Largest Eigenvalue")
+
+#Add title
+axes.set_title("Average Second Largest Eigenvalue")
+
+#Initialize line graphs
+axes.plot(mtle1, color = 'black', label = 'n=10', linestyle = '--')
+axes.plot(mtle2, color = 'red', label = 'n=20')
+axes.plot(mtle3, color = 'blue', label = 'n=50')
+axes.plot(mtle4, color = 'green', label = 'n=100')
+axes.plot(mtle5, color = 'yellow', label = 'n=200')
+axes.plot(mtle6, color = 'orange', label = 'n=500')
+axes.plot(mtle7, color = 'purple', label = 'n=1000')
+axes.plot(mtleMF7, color = 'black', label = 'MF')
 #axes.plot(mdeMF7**3, color = 'red', linestyle = ':',label = 'Erdos Renyi', linewidth = 2)
 
 #Add legend
@@ -715,40 +857,42 @@ mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
 mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
 mxlimT = max(mxlim,mxlimMF)
 
-#Max quantile and actual quantiles
-mxqua = np.ceil(stats.chi2.ppf(q=0.98,df=2))
-quas = stats.chi2.ppf(q=np.arange(0.02,1,0.02),df=2)
-
-i=0
-for n in [10,20,50,100,200,500,1000]:
-    ##Create figure and axes for animation
-    fig, axes = plt.subplots()
-    
-    #Create axes
-    axes.set_xlim(0,mxqua)
-    axes.set_ylim(0,mxlimT)
-    axes.set_xlabel("chi2 quantiles")
-    axes.set_ylabel("sample quantiles")
-    
-    #Add title
-    axes.set_title("Mahalanobis QQ Plot: n = "+str(n))
-    
-    #Initialize line graphs
-    axes.scatter(quas, mqua1, c='b',s=5)
-    
-    ##Create figure and axes for animation
-    fig, axes = plt.subplots()
-    
-    #Create axes
-    axes.set_xlim(0,mxqua)
-    axes.set_ylim(0,mxlimT)
-    axes.set_xlabel("chi2 quantiles")
-    axes.set_ylabel("sample quantiles")
-    
-    #Add title
-    axes.set_title("Mahalanobis QQ Plot (Mean Field): n = "+str(n))
-    
-    #Initialize line graphs
-    axes.scatter(quas, mquaMF1[:,i], c='b',s=5)
-    
-    i=i+1
+# =============================================================================
+# #Max quantile and actual quantiles
+# mxqua = np.ceil(stats.chi2.ppf(q=0.98,df=2))
+# quas = stats.chi2.ppf(q=np.arange(0.02,1,0.02),df=2)
+# 
+# i=0
+# for n in [10,20,50,100,200,500,1000]:
+#     ##Create figure and axes for animation
+#     fig, axes = plt.subplots()
+#     
+#     #Create axes
+#     axes.set_xlim(0,mxqua)
+#     axes.set_ylim(0,mxlimT)
+#     axes.set_xlabel("chi2 quantiles")
+#     axes.set_ylabel("sample quantiles")
+#     
+#     #Add title
+#     axes.set_title("Mahalanobis QQ Plot: n = "+str(n))
+#     
+#     #Initialize line graphs
+#     axes.scatter(quas, mqua1, c='b',s=5)
+#     
+#     ##Create figure and axes for animation
+#     fig, axes = plt.subplots()
+#     
+#     #Create axes
+#     axes.set_xlim(0,mxqua)
+#     axes.set_ylim(0,mxlimT)
+#     axes.set_xlabel("chi2 quantiles")
+#     axes.set_ylabel("sample quantiles")
+#     
+#     #Add title
+#     axes.set_title("Mahalanobis QQ Plot (Mean Field): n = "+str(n))
+#     
+#     #Initialize line graphs
+#     axes.scatter(quas, mquaMF1[:,i], c='b',s=5)
+#     
+#     i=i+1
+# =============================================================================
