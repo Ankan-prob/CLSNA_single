@@ -8,17 +8,31 @@ import simulation as sm
 import saveload as sl
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy as sp
 import os
 import scipy.stats as stats
 
 ##################Load statistics
-filebase1 = "runwnv210"
-filebase2 = "runwnv220"
-filebase3 = "runwnv250"
-filebase4 = "runwnv2100"
-filebase5 = "runwnv2200"
-filebase6 = "runwnv2500"
-filebase7 = "runwnv21000"
+# =============================================================================
+# filebase1 = "runwnv210"
+# filebase2 = "runwnv220"
+# filebase3 = "runwnv250"
+# filebase4 = "runwnv2100"
+# filebase5 = "runwnv2200"
+# filebase6 = "runwnv2500"
+# filebase7 = "runwnv21000"
+# =============================================================================
+
+eb = "runwnv2"
+#eb = "runwv3n"
+
+filebase1 = eb + "10"
+filebase2 = eb + "20"
+filebase3 = eb + "50"
+filebase4 = eb + "100"
+filebase5 = eb + "200"
+filebase6 = eb + "500"
+filebase7 = eb + "1000"
 
 cp1 = sm.CoupledParticle()
 cp2 = sm.CoupledParticle()
@@ -131,6 +145,22 @@ tdeMF4 = am4[6]
 tdeMF5 = am5[6]
 tdeMF6 = am6[6]
 tdeMF7 = am7[6]
+
+#load clustering coefficients
+cl1 = am1[2]
+cl2 = am2[2]
+cl3 = am3[2]
+cl4 = am4[2]
+cl5 = am5[2]
+cl6 = am6[2]
+cl7 = am7[2]
+clMF1 = am1[7]
+clMF2 = am2[7]
+clMF3 = am3[7]
+clMF4 = am4[7]
+clMF5 = am5[7]
+clMF6 = am6[7]
+clMF7 = am7[7]
 
 #load largest eigenvalues
 le1 = am1[3][2,:,:]
@@ -291,6 +321,9 @@ axes.plot(msmMF7, color = 'purple',label = 'n=1000')
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
+#Save figure
+plt.savefig("plots\\meanMF"+eb+".pdf")
+
 ##Create figure and axes for MF mean x coord simulations
 fig, axes = plt.subplots()
 
@@ -316,6 +349,9 @@ axes.plot(msmMF7, color = 'black', label = 'MF (n=1000)')
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         
+#Save figure
+plt.savefig("plots\\mean"+eb+".pdf")
+
 ###########Plot MSE
 
 #Get the mean MSE
@@ -360,6 +396,9 @@ axes.plot(mmse7, color = 'purple', label = 'n=1000')
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
+#Save figure
+plt.savefig("plots\\MSE"+eb+".pdf")
+
 ###########Plot Graph Density
 
 #Get the mean Graph Density
@@ -399,7 +438,7 @@ mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
 mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
 mxlimT = max(mxlim,mxlimMF)
 
-#########MF graph density plots
+#########MF edge density plots
 ##Create figure and axes for animation
 fig, axes = plt.subplots()
 
@@ -407,10 +446,10 @@ fig, axes = plt.subplots()
 axes.set_xlim(0,101)
 axes.set_ylim(0,mxlimMF)
 axes.set_xlabel("Time")
-axes.set_ylabel("Average Graph Density")
+axes.set_ylabel("Average Edge Density")
 
 #Add title
-axes.set_title("Average Graph Density of the MF Simulation")
+axes.set_title("Average Edge Density of the MF Simulation")
 
 #Initialize line graphs
 axes.plot(mdeMF1, color = 'black', label = 'n=10')
@@ -424,7 +463,10 @@ axes.plot(mdeMF7, color = 'purple', label = 'n=1000')
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-#########Triangle density plots
+#Save figure
+plt.savefig("plots\\egdedensityMF"+eb+".pdf")
+
+#########Edge density plots
 ##Create figure and axes for animation
 fig, axes = plt.subplots()
 
@@ -432,10 +474,10 @@ fig, axes = plt.subplots()
 axes.set_xlim(0,101)
 axes.set_ylim(0,mxlimT)
 axes.set_xlabel("Time")
-axes.set_ylabel("Average Graph Density")
+axes.set_ylabel("Average Edge Density")
 
 #Add title
-axes.set_title("Average Graph Density")
+axes.set_title("Average Edge Density")
 
 #Initialize line graphs
 axes.plot(mde1, color = 'black', label = 'n=10', linestyle = '--')
@@ -445,10 +487,13 @@ axes.plot(mde4, color = 'green', label = 'n=100')
 axes.plot(mde5, color = 'yellow', label = 'n=200')
 axes.plot(mde6, color = 'orange', label = 'n=500')
 axes.plot(mde7, color = 'purple', label = 'n=1000')
-axes.plot(mde7, color = 'black', label = 'MF')
+axes.plot(mdeMF7, color = 'black', label = 'MF')
 
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\edgedensity"+eb+".pdf")
 
 ###########Plot Triangle Density
 
@@ -514,6 +559,9 @@ axes.plot(mtdeMF7, color = 'purple', label = 'n=1000')
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
+#Save figure
+plt.savefig("plots\\triangledensityMF"+eb+".pdf")
+
 #########Triangle density plots
 ##Create figure and axes for animation
 fig, axes = plt.subplots()
@@ -540,6 +588,160 @@ axes.plot(mtdeMF7, color = 'black', label = 'MF')
 
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\triangledensity"+eb+".pdf")
+
+#######Triangle Density MF vs Erdos Renyi
+#Get expected Erdos Renyi triangle density
+ERtde = 6*sp.special.comb(1000,3)*mdeMF7**3/(1000**3)
+mx = max(np.max(mtdeMF7),np.max(ERtde))
+
+##Create figure and axes for animation
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(0,mx)
+axes.set_xlabel("Time")
+axes.set_ylabel("Average/Expected Triangle Density")
+
+#Add title
+axes.set_title("Average/Expected Triangle Density of MF vs Erdos Renyi")
+
+#Initialize line graphs
+axes.plot(mtdeMF7, color = 'black', label = 'MF')
+axes.plot(ERtde, color = 'red', label = 'Erdos Renyi')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\triangledensityER"+eb+".pdf")
+
+###########Plot Clustering Coefficient
+
+#Get the mean clustering coefficient
+mcl1 = np.mean(cl1,1)
+mcl2 = np.mean(cl2,1)
+mcl3 = np.mean(cl3,1)
+mcl4 = np.mean(cl4,1)
+mcl5 = np.mean(cl5,1)
+mcl6 = np.mean(cl6,1)
+mcl7 = np.mean(cl7,1)
+
+mclMF1 = np.mean(clMF1,1)
+mclMF2 = np.mean(clMF2,1)
+mclMF3 = np.mean(clMF3,1)
+mclMF4 = np.mean(clMF4,1)
+mclMF5 = np.mean(clMF5,1)
+mclMF6 = np.mean(clMF6,1)
+mclMF7 = np.mean(clMF7,1)
+
+mxm1 = np.max(mcl1)
+mxm2 = np.max(mcl2)
+mxm3 = np.max(mcl3)
+mxm4 = np.max(mcl4)
+mxm5 = np.max(mcl5)
+mxm6 = np.max(mcl6)
+mxm7 = np.max(mcl7)
+
+mxmMF1 = np.max(mclMF1)
+mxmMF2 = np.max(mclMF2)
+mxmMF3 = np.max(mclMF3)
+mxmMF4 = np.max(mclMF4)
+mxmMF5 = np.max(mclMF5)
+mxmMF6 = np.max(mclMF6)
+mxmMF7 = np.max(mclMF7)
+
+mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
+mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
+mxlimT = max(mxlim,mxlimMF)
+
+#########MF clustering coefficient plots
+##Create figure and axes for plot
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(0,mxlimMF)
+axes.set_xlabel("Time")
+axes.set_ylabel("Average Clustering Coefficient")
+
+#Add title
+axes.set_title("Average Clustering Coefficient of the MF Simulation")
+
+#Initialize line graphs
+axes.plot(mclMF1, color = 'black', label = 'n=10')
+axes.plot(mclMF2, color = 'red', label = 'n=20')
+axes.plot(mclMF3, color = 'blue', label = 'n=50')
+axes.plot(mclMF4, color = 'green', label = 'n=100')
+axes.plot(mclMF5, color = 'yellow', label = 'n=200')
+axes.plot(mclMF6, color = 'orange', label = 'n=500')
+axes.plot(mclMF7, color = 'purple', label = 'n=1000')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\clusteringMF"+eb+".pdf")
+
+#########clustering coefficient plots
+##Create figure and axes for plot
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(0,mxlimT)
+axes.set_xlabel("Time")
+axes.set_ylabel("Average Clustering Coefficient")
+
+#Add title
+axes.set_title("Average Clustering Coefficient")
+
+#Initialize line graphs
+axes.plot(mcl1, color = 'black', label = 'n=10', linestyle = '--')
+axes.plot(mcl2, color = 'red', label = 'n=20')
+axes.plot(mcl3, color = 'blue', label = 'n=50')
+axes.plot(mcl4, color = 'green', label = 'n=100')
+axes.plot(mcl5, color = 'yellow', label = 'n=200')
+axes.plot(mcl6, color = 'orange', label = 'n=500')
+axes.plot(mcl7, color = 'purple', label = 'n=1000')
+axes.plot(mclMF7, color = 'black', label = 'MF')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\clustering"+eb+".pdf")
+
+#######Clustering Coefficient MF vs Erdos Renyi
+
+#Get asymptotic Erdos Renyi clustering coefficient
+ERcl = mdeMF7
+mx = max(np.max(mclMF7),np.max(ERcl))
+
+##Create figure and axes for animation
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(0,mx)
+axes.set_xlabel("Time")
+axes.set_ylabel("Average/Asymptotic Clustering Coefficient")
+
+#Add title
+axes.set_title("Average/Asymptotic Clustering Coefficient of MF vs Erdos Renyi")
+
+#Initialize line graphs
+axes.plot(mclMF7, color = 'black', label = 'MF')
+axes.plot(ERcl, color = 'red', label = 'Erdos Renyi')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\clusteringER"+eb+".pdf")
 
 #########Largest eigenvalue plot
 
@@ -606,6 +808,9 @@ axes.plot(mleMF7, color = 'purple', label = 'n=1000')
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
+#Save figure
+plt.savefig("plots\\leigMF"+eb+".pdf")
+
 #########Largest eigenvalue plots
 
 ##Create figure and axes for animation
@@ -633,6 +838,9 @@ axes.plot(mleMF7, color = 'black', label = 'MF')
 
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\leig"+eb+".pdf")
 
 #########Second Largest eigenvalue plot
 
@@ -699,6 +907,9 @@ axes.plot(msleMF7, color = 'purple', label = 'n=1000')
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
+#Save figure
+plt.savefig("plots\\sleigMF"+eb+".pdf")
+
 #########Second Largest eigenvalue plots
 ##Create figure and axes for animation
 fig, axes = plt.subplots()
@@ -726,9 +937,12 @@ axes.plot(msleMF7, color = 'black', label = 'MF')
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
+#Save figure
+plt.savefig("plots\\sleig"+eb+".pdf")
+
 #########Third Largest eigenvalue plot
 
-#Get the second largest eigenvalue bounds
+#Get the third largest eigenvalue bounds
 mtle1 = np.mean(tle1,1)/10
 mtle2 = np.mean(tle2,1)/20
 mtle3 = np.mean(tle3,1)/50
@@ -791,6 +1005,9 @@ axes.plot(mtleMF7, color = 'purple', label = 'n=1000')
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
+#Save figure
+plt.savefig("plots\\tleigMF"+eb+".pdf")
+
 #########Second Largest eigenvalue plots
 ##Create figure and axes for animation
 fig, axes = plt.subplots()
@@ -799,10 +1016,10 @@ fig, axes = plt.subplots()
 axes.set_xlim(0,101)
 axes.set_ylim(0,mxlimT)
 axes.set_xlabel("Time")
-axes.set_ylabel("Average Second Largest Eigenvalue")
+axes.set_ylabel("Average Third Largest Eigenvalue")
 
 #Add title
-axes.set_title("Average Second Largest Eigenvalue")
+axes.set_title("Average Third Largest Eigenvalue")
 
 #Initialize line graphs
 axes.plot(mtle1, color = 'black', label = 'n=10', linestyle = '--')
@@ -818,44 +1035,50 @@ axes.plot(mtleMF7, color = 'black', label = 'MF')
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-###############QQ Plots
+#Save figure
+plt.savefig("plots\\tleig"+eb+".pdf")
 
-#Get quantiles at time T
-mqua1 = np.flatten(qua1[:,ssl1.cp.T-1,:],axis = 1)
-mqua2 = qua2[:,ssl2.cp.T-1,:]
-mqua3 = qua3[:,ssl3.cp.T-1,:]
-mqua4 = qua4[:,ssl4.cp.T-1,:]
-mqua5 = qua5[:,ssl5.cp.T-1,:]
-mqua6 = qua6[:,ssl6.cp.T-1,:]
-mqua7 = qua7[:,ssl7.cp.T-1,:]
 
-mquaMF1 = quaMF1[:,ssl1.cp.T-1,:]
-mquaMF2 = quaMF2[:,ssl2.cp.T-1,:]
-mquaMF3 = quaMF3[:,ssl3.cp.T-1,:]
-mquaMF4 = quaMF4[:,ssl4.cp.T-1,:]
-mquaMF5 = quaMF5[:,ssl5.cp.T-1,:]
-mquaMF6 = quaMF6[:,ssl6.cp.T-1,:]
-mquaMF7 = quaMF7[:,ssl7.cp.T-1,:]
-
-mxm1 = np.max(mqua1)
-mxm2 = np.max(mqua2)
-mxm3 = np.max(mqua3)
-mxm4 = np.max(mqua4)
-mxm5 = np.max(mqua5)
-mxm6 = np.max(mqua6)
-mxm7 = np.max(mqua7)
-
-mxmMF1 = np.max(mquaMF1)
-mxmMF2 = np.max(mquaMF2)
-mxmMF3 = np.max(mquaMF3)
-mxmMF4 = np.max(mquaMF4)
-mxmMF5 = np.max(mquaMF5)
-mxmMF6 = np.max(mquaMF6)
-mxmMF7 = np.max(mquaMF7)
-
-mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
-mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
-mxlimT = max(mxlim,mxlimMF)
+# =============================================================================
+# ###############QQ Plots
+# 
+# #Get quantiles at time T
+# mqua1 = qua1[:,ssl1.cp.T-1,:]
+# mqua2 = qua2[:,ssl2.cp.T-1,:]
+# mqua3 = qua3[:,ssl3.cp.T-1,:]
+# mqua4 = qua4[:,ssl4.cp.T-1,:]
+# mqua5 = qua5[:,ssl5.cp.T-1,:]
+# mqua6 = qua6[:,ssl6.cp.T-1,:]
+# mqua7 = qua7[:,ssl7.cp.T-1,:]
+# 
+# mquaMF1 = quaMF1[:,ssl1.cp.T-1,:]
+# mquaMF2 = quaMF2[:,ssl2.cp.T-1,:]
+# mquaMF3 = quaMF3[:,ssl3.cp.T-1,:]
+# mquaMF4 = quaMF4[:,ssl4.cp.T-1,:]
+# mquaMF5 = quaMF5[:,ssl5.cp.T-1,:]
+# mquaMF6 = quaMF6[:,ssl6.cp.T-1,:]
+# mquaMF7 = quaMF7[:,ssl7.cp.T-1,:]
+# 
+# mxm1 = np.max(mqua1)
+# mxm2 = np.max(mqua2)
+# mxm3 = np.max(mqua3)
+# mxm4 = np.max(mqua4)
+# mxm5 = np.max(mqua5)
+# mxm6 = np.max(mqua6)
+# mxm7 = np.max(mqua7)
+# 
+# mxmMF1 = np.max(mquaMF1)
+# mxmMF2 = np.max(mquaMF2)
+# mxmMF3 = np.max(mquaMF3)
+# mxmMF4 = np.max(mquaMF4)
+# mxmMF5 = np.max(mquaMF5)
+# mxmMF6 = np.max(mquaMF6)
+# mxmMF7 = np.max(mquaMF7)
+# 
+# mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
+# mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
+# mxlimT = max(mxlim,mxlimMF)
+# =============================================================================
 
 # =============================================================================
 # #Max quantile and actual quantiles
