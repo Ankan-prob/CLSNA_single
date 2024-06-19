@@ -39,7 +39,7 @@ for n in ns:
     #op is a safety parameter.
         #op=0: if safety checks fail, the program will return an error and do nothing
         #op=1: if safety checks fail, the program will override the input parameters in favor of local parameters
-    Present = sl.SimulateSaveLoad("runwnv2"+str(n),rfilebase=rf,cp=cp,op=0,q=q,nl=nl,m=m)
+    Present = sl.SimulateSaveLoad("runwv2n"+str(n),rfilebase=rf,cp=cp,op=0,q=q,nl=nl,m=m)
     
     #Construct reference measure for MF computations if necessary
     #If not necessary, this will return a warning and do nothing

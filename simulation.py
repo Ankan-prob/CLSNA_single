@@ -23,6 +23,9 @@ class NParticle:
     #   0                                       Delta mass at 0
     #   1                                       i.i.d. Standard normal      
         
+    #noi value                                  Noise
+    #   0                                       i.i.d. Standard Gaussian Noise
+    #   1                                       noiseless (noise = 0)
 
     def __init__(self,t0=1,noi = 0,n=7,T=5,gam=0.9,d=2,C=0.5,p=0.15,a=1,delt=1,dist=1,iv=2,ev=2):
         self.t0 = t0            #Initial conditions on z
@@ -150,6 +153,8 @@ class NParticle:
     def evolve(self,a,z):
         if self.noi == 0:
             noise = np.random.normal(size = (self.d,self.n))
+        elif self.noi == 1:
+            noise = np.zeros((self.d,self.n))
         else:
             raise ValueError("self.noi has an invalid value.")
         Lnum = np.matmul(z,a)
@@ -164,6 +169,8 @@ class NParticle:
     def evolve_noise(self,a,z):
         if self.noi == 0:
             noise = np.random.normal(size = (self.d,self.n))
+        elif self.noi == 1:
+            noise = np.zeros((self.d,self.n))
         else:
             raise ValueError("self.noi has an invalid value.")
         Lnum = np.matmul(z,a)
@@ -352,10 +359,12 @@ class MFParticle(NParticle):
     def evolveMF(self,b,zold,znew,zoldup):
         if self.noi == 0:
             noise = np.random.normal(size = (self.d,self.n))
+        elif self.noi == 1:
+            noise = np.zeros((self.d,self.n))
         else:
             raise ValueError("self.noi has an invalid value.")
         Lnum = np.matmul(zold,b)
-        Lden = np.matmul(np.ones(shape = (self.d,self.n)),b)
+        Lden = np.matmul(np.ones(shape = zold.shape),b)
         L = np.true_divide(Lnum,Lden,where = (Lden!= 0))
         znew = (1 - self.gam)*znew + self.gam*L + noise
         bnew = self.newAtfun(zoldup,znew,b)
@@ -450,6 +459,16 @@ class CoupledParticle(MFParticle):
                          dist=self.dist,iv=self.iv,ev=self.ev,its=self.its)
         zref = ref.simulateMF()
         return zref
+    
+    #Construct mean MF process from ref (noiseless)
+    def ConstructMeanMF(self,zref):
+        #Create a single MFParticle object with no noise initialized at 0
+        ref = MFParticle(t0=0,noi=1,n=1,T=self.T,gam=self.gam,\
+                         d=self.d,C=self.C,p=self.p,a=self.a,delt=self.delt,\
+                         dist=self.dist,iv=self.iv,ev=self.ev,its=self.its)
+        #Run the MF model with zref as the reference measure (and no noise)
+        zout = ref.oneiter(zref)
+        return zout
     
     #zref and zrefup are dxN matrices (from the reference measure)
     #b is Nxn matrix
@@ -578,6 +597,8 @@ class CoupledParticle(MFParticle):
             #cl = clustering
             #le = largest nl eigenvalues normalized by n
             #se = smallest nl eigenvalues normalized by n
+            #sd = #edges in symmetric difference of n-network and MF-network
+            #ssd = #edges in n-network only - #edges in MF-network only
         de = np.zeros((self.T,m))
         tde = np.zeros((self.T,m))
         cl = np.zeros((self.T,m))
@@ -588,6 +609,8 @@ class CoupledParticle(MFParticle):
         clMF = np.zeros((self.T,m))
         leMF = np.zeros((nl,self.T,m))
         seMF = np.zeros((nl,self.T,m))
+        sd = np.zeros((self.T,m))
+        ssd = np.zeros((self.T,m))
         
         #Repeat m times
         for i in np.arange(m):
@@ -683,12 +706,15 @@ class CoupledParticle(MFParticle):
                 seMF[:,t,i]= eigsMF[0:nl]
                 leMF[:,t,i] = eigsMF[nl:2*nl]
                 
+                sd[t,i] = abs(A-AMF).sum() 
+                ssd[t,i] = (A-AMF).sum()
+                
             #Print the iteration number
             print("iteration: " + str(i))
             
         if DEBUG:
             return (sm,sc,qua,ma,mi,smMF,scMF,quaMF,maMF,miMF,de,tde,cl,\
-                    le,se,deMF,tdeMF,clMF,leMF,seMF,Atm,Ztm,AtmMF,ZtmMF)
+                    le,se,deMF,tdeMF,clMF,leMF,seMF,sd,ssd,Atm,Ztm,AtmMF,ZtmMF)
         else:
             return (sm,sc,qua,ma,mi,smMF,scMF,quaMF,maMF,miMF,mse,de,tde,cl,\
-                    le,se,deMF,tdeMF,clMF,leMF,seMF)
+                    le,se,deMF,tdeMF,clMF,leMF,seMF,sd,ssd)

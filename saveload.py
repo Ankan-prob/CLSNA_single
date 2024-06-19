@@ -124,6 +124,7 @@ class SimulateSaveLoad():
         self.filebase = filebase
         self.pth = os.path.join("simdata",filebase)
         (self.q,self.nl,self.m,self.cp,self.rfilebase) = self.loadCPFromFilebase(self.filebase)
+        self.rfile = os.path.join("simdata",self.rfilebase) + "\\Ref.npy"
         return 
     
     def checkrfilebase(self):
@@ -187,9 +188,38 @@ class SimulateSaveLoad():
         return 
 
     #Load reference particles from a (possibly different) filebase
-    #All checks have already been done!
-    def loadref(self):
+    def loadref(self,op=0):
+        #Run a safety check
+        self.safetyCheck(op)
+        
         return np.load(self.rfile)
+    
+    #Save a Mean MF (MF generated without noise)
+    def saveMeanMF(self,op=0):
+        #Run a safety check
+        self.safetyCheck(op)
+        
+        #Check if the Mean MF already exists
+        if os.path.exists(self.pth+"\\MRef.npy"):
+            return 
+        
+        #load the reference measure
+        zref = self.loadref()
+        
+        #Construct the noiseless MF process
+        zout = self.cp.ConstructMeanMF(zref)
+        
+        #Save zout
+        np.save(self.pth + "\\MRef.npy",zout)
+        
+        #return
+        return
+    
+    def loadMeanMF(self,op=0):
+        #Run a safety check
+        self.safetyCheck(op)
+        
+        return np.load(self.pth + "\\MRef.npy")
                     
     #Save n particle only (useful for finding good parameters)
     def savenpartdata(self,op=0):
@@ -275,42 +305,6 @@ class SimulateSaveLoad():
         ZMFt = np.load(self.pth + "\\coupledZMF.npy")
         
         return (At,Zt,AMFt,ZMFt)
-        
-# =============================================================================
-#     #NOT USEFUL
-#     #Simulate and save m coupled simulations given a reference
-#     #filebase does not need to match our filebase
-#     #if we already have a reference, use the existing reference measure
-#     def savemCoupleGivenRef(self, filebase, op=0):
-#         #Run a safety check
-#         self.safetyCheck(op)
-#         
-#         #Check if we need a reference file
-#         if os.path.exists(self.pth + "\\Ref.npy"):
-#             zref = self.loadref(filebase)
-#         else:
-#             zref = self.saveref(self.filebase,op)
-#         
-#         #Check if we've already generated this
-#         if os.path.exists(self.pth + "\\mcoupledZ.npy"):
-#             return
-#         
-#         (Zt,ZMFt) = self.cp.CoupledSimulationsCombine(self.m, zref)
-#         
-#         #Save particle trajectories
-#         np.save(self.pth + "\\mcoupledZ.npy",Zt)
-#         np.save(self.pth + "\\mcoupledZMF.npy",ZMFt)
-#         
-#     #NOT USEFUL
-#     def loadmCoupled(self,op=0):
-#         #Run a safety check
-#         self.safetyCheck(op)
-#             
-#         Zt = np.load(self.pth + "\\mcoupledZ.npy")
-#         ZMFt = np.load(self.pth + "\\mcoupledZMF.npy")
-#         
-#         return (self.m,Zt,ZMFt)
-# =============================================================================
     
     #When both m and n are large, we instead save important statistics
     def savemCoupledStatistics(self, op = 0, DEBUG = False):
@@ -336,11 +330,12 @@ class SimulateSaveLoad():
         #Save all A statistics
         np.savez(self.pth+"\\astats.npz",de=dat[11],tde=dat[12]\
                  ,cl=dat[13],le=dat[14],se=dat[15],deMF=dat[16]\
-                 ,tdeMF=dat[17],clMF=dat[18],leMF=dat[19],seMF=dat[20])
+                 ,tdeMF=dat[17],clMF=dat[18],leMF=dat[19],seMF=dat[20]\
+                 ,sd=dat[21],ssd=dat[22])
         
         if DEBUG:
-            np.savez(self.pth + "\\statsDEBUG.npz",at=dat[21],zt=dat[22]\
-                     ,atMF=dat[23],ztMF=dat[24])
+            np.savez(self.pth + "\\statsDEBUG.npz",at=dat[23],zt=dat[24]\
+                     ,atMF=dat[25],ztMF=dat[26])
         return
     
     #load the z statistics
@@ -379,8 +374,10 @@ class SimulateSaveLoad():
             clMF = dat['clMF']
             leMF = dat['leMF']
             seMF = dat['seMF']
+            sd = dat['sd']
+            ssd = dat['ssd']
         
-        return (de,tde,cl,le,se,deMF,tdeMF,clMF,leMF,seMF)
+        return (de,tde,cl,le,se,deMF,tdeMF,clMF,leMF,seMF,sd,ssd)
             
     #Only works if debug was activated
     def loadmDEBUGstatistics(self, op = 0):

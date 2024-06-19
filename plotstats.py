@@ -23,7 +23,7 @@ import scipy.stats as stats
 # filebase7 = "runwnv21000"
 # =============================================================================
 
-eb = "runwnv2"
+eb = "runwv2n"
 #eb = "runwv3n"
 
 filebase1 = eb + "10"
@@ -51,6 +51,14 @@ ssl4 = sl.SimulateSaveLoad(filebase4,op=1,cp=cp4)
 ssl5 = sl.SimulateSaveLoad(filebase5,op=1,cp=cp5)
 ssl6 = sl.SimulateSaveLoad(filebase6,op=1,cp=cp6)
 ssl7 = sl.SimulateSaveLoad(filebase7,op=1,cp=cp7)
+
+#load reference MF particle trajectory
+refmf = ssl1.loadref()
+
+#Run an MF simulation.
+#This should be deterministic and not depend on which ssl we choose
+ssl1.saveMeanMF()
+mMF = ssl1.loadMeanMF()
 
 #load Z Statistics
 sm1 = ssl1.loadmCoupledZStatistics()
@@ -258,6 +266,24 @@ steMF5 = am5[9][2,:,:]
 steMF6 = am6[9][2,:,:]
 steMF7 = am7[9][2,:,:]
 
+#load the number of edges in the symmetric difference graph
+sd1 = am1[10]/2
+sd2 = am2[10]/2
+sd3 = am3[10]/2
+sd4 = am4[10]/2
+sd5 = am5[10]/2
+sd6 = am6[10]/2
+sd7 = am7[10]/2
+
+# # of edges in AMF - # of edges in An
+MFmn1 = -am1[11]/2
+MFmn2 = -am2[11]/2
+MFmn3 = -am3[11]/2
+MFmn4 = -am4[11]/2
+MFmn5 = -am5[11]/2
+MFmn6 = -am6[11]/2
+MFmn7 = -am7[11]/2
+
 ############Plot Means
 
 #ml1=0
@@ -275,6 +301,10 @@ msmMF4 = np.mean(smMF4[0,:,:],axis=1)*np.sqrt(100.0*100.0)
 msmMF5 = np.mean(smMF5[0,:,:],axis=1)*np.sqrt(200.0*100.0)
 msmMF6 = np.mean(smMF6[0,:,:],axis=1)*np.sqrt(500.0*100.0)
 msmMF7 = np.mean(smMF7[0,:,:],axis=1)*np.sqrt(1000.0*100.0)
+
+#Get mean reference MF x coordinate (normalized to match msmMF7)
+mrefmf = np.mean(refmf[0,:,:],0)*np.sqrt(ssl1.cp.N)*np.sqrt(10.0)
+smMF = np.mean(mMF[0,:,:],0)*np.sqrt(1000.0*100.0)
 
 #plot bounds
 mxm1 = np.max(np.abs(msm1))
@@ -296,6 +326,9 @@ mxmMF7 = np.max(np.abs(msmMF7))
 mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
 mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
 mxlimT = max(mxlim,mxmMF7)
+mxref = np.max(mrefmf)
+mxmMF = np.max(smMF)
+mxlimMFref = max(mxlimMF,mxref,mxmMF)
 
 ##Create figure and axes for MF mean x coord simulations
 fig, axes = plt.subplots()
@@ -304,10 +337,10 @@ fig, axes = plt.subplots()
 axes.set_xlim(0,101)
 axes.set_ylim(-mxlimMF,mxlimMF)
 axes.set_xlabel("Time")
-axes.set_ylabel("Mean x coordinate*sqrt(nm)")
+axes.set_ylabel("Mean (normalized)")
 
 #Add title
-axes.set_title("Mean (sqrt(nm) normalized) x coordinates of MF particles")
+axes.set_title("Normalized Mean of x coordinates of MF particles")
 
 #Initialize line graphs
 axes.plot(msmMF1, color = 'black',label = 'n=10')
@@ -317,6 +350,7 @@ axes.plot(msmMF4, color = 'green',label = 'n=100')
 axes.plot(msmMF5, color = 'yellow',label = 'n=200')
 axes.plot(msmMF6, color = 'orange',label = 'n=500')
 axes.plot(msmMF7, color = 'purple',label = 'n=1000')
+#axes.plot(mrefmf, color = 'black', label = 'reference', linewidth = 3.0)
 
 #Add legend
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
@@ -329,12 +363,66 @@ fig, axes = plt.subplots()
 
 #Create axes
 axes.set_xlim(0,101)
-axes.set_ylim(-mxlimT,mxlimT)
+axes.set_ylim(-mxlimMFref,mxlimMFref)
 axes.set_xlabel("Time")
-axes.set_ylabel("Mean x coordinate*sqrt(nm)")
+axes.set_ylabel("Mean (scaled)")
 
 #Add title
-axes.set_title("Mean (sqrt(nm) normalized) x coordinates particles")
+axes.set_title("Scaled Mean x Coordinate of Reference vs MF vs Noiseless MF Particles")
+
+#Initialize line graphs
+axes.plot(mrefmf, color = 'black', label = 'reference')
+axes.plot(msmMF7, color = 'red', label = 'MF (n=1000)')
+axes.plot(smMF, color = 'blue', label = 'Noiseless MF')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        
+#Save figure
+plt.savefig("plots\\meanrefMF"+eb+".pdf", bbox_inches = 'tight')
+
+##Create figure and axes for cross correlation
+fig, axes = plt.subplots()
+
+#generate data
+corr = sp.signal.correlate(msmMF7,mrefmf)
+corr = corr/np.max(corr)
+lags = sp.signal.correlation_lags(len(mrefmf),len(msmMF7))
+a = np.argmax(corr)
+mxcorr = lags[a]
+ys = np.linspace(0,1)
+xs = np.ones(ys.shape)*mxcorr
+
+#Create axes
+axes.set_xlim(np.min(lags),np.max(lags))
+axes.set_ylim(0,np.max(corr))
+axes.set_xlabel("Time Lag")
+axes.set_ylabel("Normalized Time-Shifted Convolution")
+
+#Add title
+axes.set_title("Time Lag Analysis of MF and Reference Particles (x Coord)")
+
+#Generate the plot
+axes.plot(lags,corr, color = 'black', label = 'time-shifted convolution')
+axes.plot(xs,ys, color = 'black', linestyle = '--', label = 'maximum time lag')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save the figure
+plt.savefig("plots\\crosscorr"+eb+".pdf", bbox_inches = 'tight')
+
+##Create figure and axes for MF mean x coord simulations
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(-mxlimT,mxlimT)
+axes.set_xlabel("Time")
+axes.set_ylabel("Mean (normalized)")
+
+#Add title
+axes.set_title("Normalized Mean of x Coordinates")
 
 #Initialize line graphs
 axes.plot(msm1, color = 'black', linestyle = '--', label = 'n=10')
@@ -350,7 +438,193 @@ axes.plot(msmMF7, color = 'black', label = 'MF (n=1000)')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         
 #Save figure
-plt.savefig("plots\\mean"+eb+".pdf")
+plt.savefig("plots\\mean"+eb+".pdf", bbox_inches = 'tight')
+
+###########Plot reference centered mean 
+mcsm1 = (np.mean(smp1[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N)) *np.sqrt(10.0*100.0)
+mcsm2 = (np.mean(smp2[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(20.0*100.0)
+mcsm3 = (np.mean(smp3[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(50.0*100.0)
+mcsm4 = (np.mean(smp4[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(100.0*100.0)
+mcsm5 = (np.mean(smp5[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(200.0*100.0)
+mcsm6 = (np.mean(smp6[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(500.0*100.0)
+mcsm7 = (np.mean(smp7[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(1000.0*100.0)
+mcsmMF1 = (np.mean(smMF1[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(10.0*100.0)
+mcsmMF2 = (np.mean(smMF2[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(20.0*100.0)
+mcsmMF3 = (np.mean(smMF3[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(50.0*100.0)
+mcsmMF4 = (np.mean(smMF4[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(100.0*100.0)
+mcsmMF5 = (np.mean(smMF5[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(200.0*100.0)
+mcsmMF6 = (np.mean(smMF6[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(500.0*100.0)
+mcsmMF7 = (np.mean(smMF7[0,:,:],axis=1)- mrefmf/np.sqrt(ssl1.cp.N))*np.sqrt(1000.0*100.0)
+
+#plot bounds
+mxm1 = np.max(np.abs(mcsm1))
+mxm2 = np.max(np.abs(mcsm2))
+mxm3 = np.max(np.abs(mcsm3))
+mxm4 = np.max(np.abs(mcsm4))
+mxm5 = np.max(np.abs(mcsm5))
+mxm6 = np.max(np.abs(mcsm6))
+mxm7 = np.max(np.abs(mcsm7))
+
+mxmMF1 = np.max(np.abs(mcsmMF1))
+mxmMF2 = np.max(np.abs(mcsmMF2))
+mxmMF3 = np.max(np.abs(mcsmMF3))
+mxmMF4 = np.max(np.abs(mcsmMF4))
+mxmMF5 = np.max(np.abs(mcsmMF5))
+mxmMF6 = np.max(np.abs(mcsmMF6))
+mxmMF7 = np.max(np.abs(mcsmMF7))
+
+mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
+mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
+mxlimT = max(mxlim,mxmMF7)
+
+##Create figure and axes for MF mean x coord simulations
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(-mxlimMF,mxlimMF)
+axes.set_xlabel("Time")
+axes.set_ylabel("Centered Mean (normalized)")
+
+#Add title
+axes.set_title("Reference Centered Normalized Mean of x Coordinates of MF Particles")
+
+#Initialize line graphs
+axes.plot(mcsmMF1, color = 'black',label = 'n=10')
+axes.plot(mcsmMF2, color = 'red',label = 'n=20')
+axes.plot(mcsmMF3, color = 'blue',label = 'n=50')
+axes.plot(mcsmMF4, color = 'green',label = 'n=100')
+axes.plot(mcsmMF5, color = 'yellow',label = 'n=200')
+axes.plot(mcsmMF6, color = 'orange',label = 'n=500')
+axes.plot(mcsmMF7, color = 'purple',label = 'n=1000')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\cmeanMF"+eb+".pdf", bbox_inches = 'tight')
+
+##Create figure and axes for MF mean x coord simulations
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(-mxlimT,mxlimT)
+axes.set_xlabel("Time")
+axes.set_ylabel("Centered Mean (normalized)")
+
+#Add title
+axes.set_title("Reference Centered Normalized Mean of x Coordinates of Particles")
+
+#Initialize line graphs
+axes.plot(mcsm1, color = 'black', linestyle = '--', label = 'n=10')
+axes.plot(mcsm2, color = 'red',label = 'n=20')
+axes.plot(mcsm3, color = 'blue',label = 'n=50')
+axes.plot(mcsm4, color = 'green',label = 'n=100')
+axes.plot(mcsm5, color = 'yellow',label = 'n=200')
+axes.plot(mcsm6, color = 'orange',label = 'n=500')
+axes.plot(mcsm7, color = 'purple', label = 'n=1000')
+axes.plot(mcsmMF7, color = 'black', label = 'MF (n=1000)')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        
+#Save figure
+plt.savefig("plots\\cmean"+eb+".pdf", bbox_inches = 'tight')
+
+###########Plot MF centered mean 
+mMFcsm1 = np.mean(smp1[0,:,:]-smMF1[0,:,:],axis=1)*np.sqrt(10.0*100.0)
+mMFcsm2 = np.mean(smp2[0,:,:]-smMF2[0,:,:],axis=1)*np.sqrt(20.0*100.0)
+mMFcsm3 = np.mean(smp3[0,:,:]-smMF3[0,:,:],axis=1)*np.sqrt(50.0*100.0)
+mMFcsm4 = np.mean(smp4[0,:,:]-smMF4[0,:,:],axis=1)*np.sqrt(100.0*100.0)
+mMFcsm5 = np.mean(smp5[0,:,:]-smMF5[0,:,:],axis=1)*np.sqrt(200.0*100.0)
+mMFcsm6 = np.mean(smp6[0,:,:]-smMF6[0,:,:],axis=1)*np.sqrt(500.0*100.0)
+mMFcsm7 = np.mean(smp7[0,:,:]-smMF7[0,:,:],axis=1)*np.sqrt(1000.0*100.0)
+
+#plot bounds
+mxm1 = np.max(np.abs(mMFcsm1))
+mxm2 = np.max(np.abs(mMFcsm2))
+mxm3 = np.max(np.abs(mMFcsm3))
+mxm4 = np.max(np.abs(mMFcsm4))
+mxm5 = np.max(np.abs(mMFcsm5))
+mxm6 = np.max(np.abs(mMFcsm6))
+mxm7 = np.max(np.abs(mMFcsm7))
+
+mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
+
+##Create figure and axes for MF mean x coord simulations
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(-mxlim,mxlim)
+axes.set_xlabel("Time")
+axes.set_ylabel("Centered Mean (normalized)")
+
+#Add title
+axes.set_title("MF Centered mean of x Coordinates of Particles")
+
+#Initialize line graphs
+axes.plot(mMFcsm1, color = 'black',label = 'n=10')
+axes.plot(mMFcsm2, color = 'red',label = 'n=20')
+axes.plot(mMFcsm3, color = 'blue',label = 'n=50')
+axes.plot(mMFcsm4, color = 'green',label = 'n=100')
+axes.plot(mMFcsm5, color = 'yellow',label = 'n=200')
+axes.plot(mMFcsm6, color = 'orange',label = 'n=500')
+axes.plot(mMFcsm7, color = 'purple',label = 'n=1000')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\MFcmean"+eb+".pdf", bbox_inches = 'tight')
+
+###########Plot noisless MF centered mean 
+mMFmMF1 = np.mean(smMF1[0,:,:]-mMF[0,0,:],axis=1)*np.sqrt(10.0*100.0)
+mMFmMF2 = np.mean(smMF2[0,:,:]-mMF[0,0,:],axis=1)*np.sqrt(20.0*100.0)
+mMFmMF3 = np.mean(smMF3[0,:,:]-mMF[0,0,:],axis=1)*np.sqrt(50.0*100.0)
+mMFmMF4 = np.mean(smMF4[0,:,:]-mMF[0,0,:],axis=1)*np.sqrt(100.0*100.0)
+mMFmMF5 = np.mean(smMF5[0,:,:]-mMF[0,0,:],axis=1)*np.sqrt(200.0*100.0)
+mMFmMF6 = np.mean(smMF6[0,:,:]-mMF[0,0,:],axis=1)*np.sqrt(500.0*100.0)
+mMFmMF7 = np.mean(smMF7[0,:,:]-mMF[0,0,:],axis=1)*np.sqrt(1000.0*100.0)
+
+#plot bounds
+mxm1 = np.max(np.abs(mMFmMF1))
+mxm2 = np.max(np.abs(mMFmMF2))
+mxm3 = np.max(np.abs(mMFmMF3))
+mxm4 = np.max(np.abs(mMFmMF4))
+mxm5 = np.max(np.abs(mMFmMF5))
+mxm6 = np.max(np.abs(mMFmMF6))
+mxm7 = np.max(np.abs(mMFmMF7))
+
+mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
+
+##Create figure and axes for MF mean x coord simulations
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(-mxlim,mxlim)
+axes.set_xlabel("Time")
+axes.set_ylabel("Centered Mean (normalized)")
+
+#Add title
+axes.set_title("Noiseless MF Centered MF")
+
+#Initialize line graphs
+axes.plot(mMFmMF1, color = 'black',label = 'n=10')
+axes.plot(mMFmMF2, color = 'red',label = 'n=20')
+axes.plot(mMFmMF3, color = 'blue',label = 'n=50')
+axes.plot(mMFmMF4, color = 'green',label = 'n=100')
+axes.plot(mMFmMF5, color = 'yellow',label = 'n=200')
+axes.plot(mMFmMF6, color = 'orange',label = 'n=500')
+axes.plot(mMFmMF7, color = 'purple',label = 'n=1000')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\MFNcmean"+eb+".pdf", bbox_inches = 'tight')
 
 ###########Plot MSE
 
@@ -382,7 +656,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average MSE")
 
 #Add title
-axes.set_title("Average MSE of the MF Approximation")
+axes.set_title("Average MSE of the Particles wrt the MF Approximation")
 
 #Initialize line graphs
 axes.plot(mmse1, color = 'black', label = 'n=10')
@@ -397,7 +671,7 @@ axes.plot(mmse7, color = 'purple', label = 'n=1000')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\MSE"+eb+".pdf")
+plt.savefig("plots\\MSE"+eb+".pdf", bbox_inches = 'tight')
 
 ###########Plot Graph Density
 
@@ -449,7 +723,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Edge Density")
 
 #Add title
-axes.set_title("Average Edge Density of the MF Simulation")
+axes.set_title("Average Edge Density of the MF Network")
 
 #Initialize line graphs
 axes.plot(mdeMF1, color = 'black', label = 'n=10')
@@ -464,7 +738,7 @@ axes.plot(mdeMF7, color = 'purple', label = 'n=1000')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\egdedensityMF"+eb+".pdf")
+plt.savefig("plots\\egdedensityMF"+eb+".pdf", bbox_inches = 'tight')
 
 #########Edge density plots
 ##Create figure and axes for animation
@@ -477,7 +751,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Edge Density")
 
 #Add title
-axes.set_title("Average Edge Density")
+axes.set_title("Average Edge Density of the Network")
 
 #Initialize line graphs
 axes.plot(mde1, color = 'black', label = 'n=10', linestyle = '--')
@@ -493,7 +767,7 @@ axes.plot(mdeMF7, color = 'black', label = 'MF')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\edgedensity"+eb+".pdf")
+plt.savefig("plots\\edgedensity"+eb+".pdf", bbox_inches = 'tight')
 
 ###########Plot Triangle Density
 
@@ -545,7 +819,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Triangle Density")
 
 #Add title
-axes.set_title("Average Triangle Density of the MF Simulation")
+axes.set_title("Average Triangle Density of the MF Network")
 
 #Initialize line graphs
 axes.plot(mtdeMF1, color = 'black', label = 'n=10')
@@ -560,7 +834,7 @@ axes.plot(mtdeMF7, color = 'purple', label = 'n=1000')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\triangledensityMF"+eb+".pdf")
+plt.savefig("plots\\triangledensityMF"+eb+".pdf", bbox_inches = 'tight')
 
 #########Triangle density plots
 ##Create figure and axes for animation
@@ -570,7 +844,7 @@ fig, axes = plt.subplots()
 axes.set_xlim(0,101)
 axes.set_ylim(0,mxlimT)
 axes.set_xlabel("Time")
-axes.set_ylabel("Average Triangle Density")
+axes.set_ylabel("Average Triangle Density of the Network")
 
 #Add title
 axes.set_title("Average Triangle Density")
@@ -590,7 +864,7 @@ axes.plot(mtdeMF7, color = 'black', label = 'MF')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\triangledensity"+eb+".pdf")
+plt.savefig("plots\\triangledensity"+eb+".pdf", bbox_inches = 'tight')
 
 #######Triangle Density MF vs Erdos Renyi
 #Get expected Erdos Renyi triangle density
@@ -607,7 +881,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average/Expected Triangle Density")
 
 #Add title
-axes.set_title("Average/Expected Triangle Density of MF vs Erdos Renyi")
+axes.set_title("Average/Expected Triangle Density of the MF Network vs Erdos Renyi")
 
 #Initialize line graphs
 axes.plot(mtdeMF7, color = 'black', label = 'MF')
@@ -617,7 +891,7 @@ axes.plot(ERtde, color = 'red', label = 'Erdos Renyi')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\triangledensityER"+eb+".pdf")
+plt.savefig("plots\\triangledensityER"+eb+".pdf", bbox_inches = 'tight')
 
 ###########Plot Clustering Coefficient
 
@@ -669,7 +943,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Clustering Coefficient")
 
 #Add title
-axes.set_title("Average Clustering Coefficient of the MF Simulation")
+axes.set_title("Average Clustering Coefficient of the MF Network")
 
 #Initialize line graphs
 axes.plot(mclMF1, color = 'black', label = 'n=10')
@@ -684,7 +958,7 @@ axes.plot(mclMF7, color = 'purple', label = 'n=1000')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\clusteringMF"+eb+".pdf")
+plt.savefig("plots\\clusteringMF"+eb+".pdf", bbox_inches = 'tight')
 
 #########clustering coefficient plots
 ##Create figure and axes for plot
@@ -697,7 +971,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Clustering Coefficient")
 
 #Add title
-axes.set_title("Average Clustering Coefficient")
+axes.set_title("Average Clustering Coefficient of the Network")
 
 #Initialize line graphs
 axes.plot(mcl1, color = 'black', label = 'n=10', linestyle = '--')
@@ -713,7 +987,7 @@ axes.plot(mclMF7, color = 'black', label = 'MF')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\clustering"+eb+".pdf")
+plt.savefig("plots\\clustering"+eb+".pdf", bbox_inches = 'tight')
 
 #######Clustering Coefficient MF vs Erdos Renyi
 
@@ -731,7 +1005,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average/Asymptotic Clustering Coefficient")
 
 #Add title
-axes.set_title("Average/Asymptotic Clustering Coefficient of MF vs Erdos Renyi")
+axes.set_title("Average/Asymptotic Clustering Coefficient of MF Network vs Erdos Renyi")
 
 #Initialize line graphs
 axes.plot(mclMF7, color = 'black', label = 'MF')
@@ -741,7 +1015,7 @@ axes.plot(ERcl, color = 'red', label = 'Erdos Renyi')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\clusteringER"+eb+".pdf")
+plt.savefig("plots\\clusteringER"+eb+".pdf", bbox_inches = 'tight')
 
 #########Largest eigenvalue plot
 
@@ -792,7 +1066,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Largest Eigenvalue")
 
 #Add title
-axes.set_title("Average Largest Eigenvalue of the MF Simulation")
+axes.set_title("Average Largest Eigenvalue of the MF Network")
 
 #Initialize line graphs
 axes.plot(mleMF1, color = 'black', label = 'n=10', linestyle = '--')
@@ -809,7 +1083,7 @@ axes.plot(mleMF7, color = 'purple', label = 'n=1000')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\leigMF"+eb+".pdf")
+plt.savefig("plots\\leigMF"+eb+".pdf", bbox_inches = 'tight')
 
 #########Largest eigenvalue plots
 
@@ -823,7 +1097,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Largest Eigenvalue")
 
 #Add title
-axes.set_title("Average Largest Eigenvalue")
+axes.set_title("Average Largest Eigenvalue of the Network")
 
 #Initialize line graphs
 axes.plot(mle1, color = 'black', label = 'n=10', linestyle = '--')
@@ -840,7 +1114,7 @@ axes.plot(mleMF7, color = 'black', label = 'MF')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\leig"+eb+".pdf")
+plt.savefig("plots\\leig"+eb+".pdf", bbox_inches = 'tight')
 
 #########Second Largest eigenvalue plot
 
@@ -891,7 +1165,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Second Largest Eigenvalue")
 
 #Add title
-axes.set_title("Average Second Largest Eigenvalue of the MF Simulation")
+axes.set_title("Average Second Largest Eigenvalue of the MF Network")
 
 #Initialize line graphs
 axes.plot(msleMF1, color = 'black', label = 'n=10', linestyle = '--')
@@ -908,7 +1182,7 @@ axes.plot(msleMF7, color = 'purple', label = 'n=1000')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\sleigMF"+eb+".pdf")
+plt.savefig("plots\\sleigMF"+eb+".pdf", bbox_inches = 'tight')
 
 #########Second Largest eigenvalue plots
 ##Create figure and axes for animation
@@ -921,7 +1195,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Second Largest Eigenvalue")
 
 #Add title
-axes.set_title("Average Second Largest Eigenvalue")
+axes.set_title("Average Second Largest Eigenvalue of the Network")
 
 #Initialize line graphs
 axes.plot(msle1, color = 'black', label = 'n=10', linestyle = '--')
@@ -938,7 +1212,7 @@ axes.plot(msleMF7, color = 'black', label = 'MF')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\sleig"+eb+".pdf")
+plt.savefig("plots\\sleig"+eb+".pdf", bbox_inches = 'tight')
 
 #########Third Largest eigenvalue plot
 
@@ -989,7 +1263,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Third Largest Eigenvalue")
 
 #Add title
-axes.set_title("Average Third Largest Eigenvalue of the MF Simulation")
+axes.set_title("Average Third Largest Eigenvalue of the MF Network")
 
 #Initialize line graphs
 axes.plot(mtleMF1, color = 'black', label = 'n=10', linestyle = '--')
@@ -1006,7 +1280,7 @@ axes.plot(mtleMF7, color = 'purple', label = 'n=1000')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\tleigMF"+eb+".pdf")
+plt.savefig("plots\\tleigMF"+eb+".pdf", bbox_inches = 'tight')
 
 #########Second Largest eigenvalue plots
 ##Create figure and axes for animation
@@ -1019,7 +1293,7 @@ axes.set_xlabel("Time")
 axes.set_ylabel("Average Third Largest Eigenvalue")
 
 #Add title
-axes.set_title("Average Third Largest Eigenvalue")
+axes.set_title("Average Third Largest Eigenvalue of the Network")
 
 #Initialize line graphs
 axes.plot(mtle1, color = 'black', label = 'n=10', linestyle = '--')
@@ -1036,86 +1310,102 @@ axes.plot(mtleMF7, color = 'black', label = 'MF')
 axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 #Save figure
-plt.savefig("plots\\tleig"+eb+".pdf")
+plt.savefig("plots\\tleig"+eb+".pdf", bbox_inches = 'tight')
 
+###########Plot Density of the Symmetric Difference Graph
 
-# =============================================================================
-# ###############QQ Plots
-# 
-# #Get quantiles at time T
-# mqua1 = qua1[:,ssl1.cp.T-1,:]
-# mqua2 = qua2[:,ssl2.cp.T-1,:]
-# mqua3 = qua3[:,ssl3.cp.T-1,:]
-# mqua4 = qua4[:,ssl4.cp.T-1,:]
-# mqua5 = qua5[:,ssl5.cp.T-1,:]
-# mqua6 = qua6[:,ssl6.cp.T-1,:]
-# mqua7 = qua7[:,ssl7.cp.T-1,:]
-# 
-# mquaMF1 = quaMF1[:,ssl1.cp.T-1,:]
-# mquaMF2 = quaMF2[:,ssl2.cp.T-1,:]
-# mquaMF3 = quaMF3[:,ssl3.cp.T-1,:]
-# mquaMF4 = quaMF4[:,ssl4.cp.T-1,:]
-# mquaMF5 = quaMF5[:,ssl5.cp.T-1,:]
-# mquaMF6 = quaMF6[:,ssl6.cp.T-1,:]
-# mquaMF7 = quaMF7[:,ssl7.cp.T-1,:]
-# 
-# mxm1 = np.max(mqua1)
-# mxm2 = np.max(mqua2)
-# mxm3 = np.max(mqua3)
-# mxm4 = np.max(mqua4)
-# mxm5 = np.max(mqua5)
-# mxm6 = np.max(mqua6)
-# mxm7 = np.max(mqua7)
-# 
-# mxmMF1 = np.max(mquaMF1)
-# mxmMF2 = np.max(mquaMF2)
-# mxmMF3 = np.max(mquaMF3)
-# mxmMF4 = np.max(mquaMF4)
-# mxmMF5 = np.max(mquaMF5)
-# mxmMF6 = np.max(mquaMF6)
-# mxmMF7 = np.max(mquaMF7)
-# 
-# mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
-# mxlimMF = max(mxmMF1,mxmMF2,mxmMF3,mxmMF4,mxmMF5,mxmMF6,mxmMF7)
-# mxlimT = max(mxlim,mxlimMF)
-# =============================================================================
+#Get the mean density
+msd1 = np.mean(sd1,1)/(10.0*9.0/2.0)
+msd2 = np.mean(sd2,1)/(20.0*19.0/2.0)
+msd3 = np.mean(sd3,1)/(50.0*49.0/2.0)
+msd4 = np.mean(sd4,1)/(100.0*99.0/2.0)
+msd5 = np.mean(sd5,1)/(200.0*199.0/2.0)
+msd6 = np.mean(sd6,1)/(500.0*499.0/2.0)
+msd7 = np.mean(sd7,1)/(1000.0*999.0/2.0)
 
-# =============================================================================
-# #Max quantile and actual quantiles
-# mxqua = np.ceil(stats.chi2.ppf(q=0.98,df=2))
-# quas = stats.chi2.ppf(q=np.arange(0.02,1,0.02),df=2)
-# 
-# i=0
-# for n in [10,20,50,100,200,500,1000]:
-#     ##Create figure and axes for animation
-#     fig, axes = plt.subplots()
-#     
-#     #Create axes
-#     axes.set_xlim(0,mxqua)
-#     axes.set_ylim(0,mxlimT)
-#     axes.set_xlabel("chi2 quantiles")
-#     axes.set_ylabel("sample quantiles")
-#     
-#     #Add title
-#     axes.set_title("Mahalanobis QQ Plot: n = "+str(n))
-#     
-#     #Initialize line graphs
-#     axes.scatter(quas, mqua1, c='b',s=5)
-#     
-#     ##Create figure and axes for animation
-#     fig, axes = plt.subplots()
-#     
-#     #Create axes
-#     axes.set_xlim(0,mxqua)
-#     axes.set_ylim(0,mxlimT)
-#     axes.set_xlabel("chi2 quantiles")
-#     axes.set_ylabel("sample quantiles")
-#     
-#     #Add title
-#     axes.set_title("Mahalanobis QQ Plot (Mean Field): n = "+str(n))
-#     
-#     #Initialize line graphs
-#     axes.scatter(quas, mquaMF1[:,i], c='b',s=5)
-#     
-#     i=i+1
-# =============================================================================
+mxm1 = np.max(msd1)
+mxm2 = np.max(msd2)
+mxm3 = np.max(msd3)
+mxm4 = np.max(msd4)
+mxm5 = np.max(msd5)
+mxm6 = np.max(msd6)
+mxm7 = np.max(msd7)
+
+mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
+
+#########MF clustering coefficient plots
+##Create figure and axes for plot
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(0,mxlim)
+axes.set_xlabel("Time")
+axes.set_ylabel("Density")
+
+#Add title
+axes.set_title("Average Density of the n-particle/MF Symmetric Difference Network")
+
+#Initialize line graphs
+axes.plot(msd1, color = 'black', label = 'n=10')
+axes.plot(msd2, color = 'red', label = 'n=20')
+axes.plot(msd3, color = 'blue', label = 'n=50')
+axes.plot(msd4, color = 'green', label = 'n=100')
+axes.plot(msd5, color = 'yellow', label = 'n=200')
+axes.plot(msd6, color = 'orange', label = 'n=500')
+axes.plot(msd7, color = 'purple', label = 'n=1000')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\symmdiffdense"+eb+".pdf", bbox_inches = 'tight')
+
+###########Plot Average Excess Edge Density in MF
+
+#Get the mean density
+mMFmn1 = np.mean(MFmn1,1)/(10.0*9.0/2.0)
+mMFmn2 = np.mean(MFmn2,1)/(20.0*19.0/2.0)
+mMFmn3 = np.mean(MFmn3,1)/(50.0*49.0/2.0)
+mMFmn4 = np.mean(MFmn4,1)/(100.0*99.0/2.0)
+mMFmn5 = np.mean(MFmn5,1)/(200.0*199.0/2.0)
+mMFmn6 = np.mean(MFmn6,1)/(500.0*499.0/2.0)
+mMFmn7 = np.mean(MFmn7,1)/(1000.0*999.0/2.0)
+
+mxm1 = np.max(np.abs(mMFmn1))
+mxm2 = np.max(np.abs(mMFmn2))
+mxm3 = np.max(np.abs(mMFmn3))
+mxm4 = np.max(np.abs(mMFmn4))
+mxm5 = np.max(np.abs(mMFmn5))
+mxm6 = np.max(np.abs(mMFmn6))
+mxm7 = np.max(np.abs(mMFmn7))
+
+mxlim = max(mxm1,mxm2,mxm3,mxm4,mxm5,mxm6,mxm7)
+
+#########MF clustering coefficient plots
+##Create figure and axes for plot
+fig, axes = plt.subplots()
+
+#Create axes
+axes.set_xlim(0,101)
+axes.set_ylim(-mxlim,mxlim)
+axes.set_xlabel("Time")
+axes.set_ylabel("Excess Edge Density")
+
+#Add title
+axes.set_title("Average Excess Edge Density in the MF Network")
+
+#Initialize line graphs
+axes.plot(mMFmn1, color = 'black', label = 'n=10')
+axes.plot(mMFmn2, color = 'red', label = 'n=20')
+axes.plot(mMFmn3, color = 'blue', label = 'n=50')
+axes.plot(mMFmn4, color = 'green', label = 'n=100')
+axes.plot(mMFmn5, color = 'yellow', label = 'n=200')
+axes.plot(mMFmn6, color = 'orange', label = 'n=500')
+axes.plot(mMFmn7, color = 'purple', label = 'n=1000')
+
+#Add legend
+axes.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#Save figure
+plt.savefig("plots\\MFexcessedges"+eb+".pdf", bbox_inches = 'tight')
