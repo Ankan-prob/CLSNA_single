@@ -16,6 +16,7 @@ t0=1                          ##Initial conditions:
                                       #t0=1: the particles are initialized as i.i.d. standard Gaussians
 noi=0                         ##Noise distribution:
                                       #noi=0: standard Gaussian noise
+                                      #noi=1: no noise
 n=7                           ##Number of particles
 T=5                           ##Number of time steps we run the simulation
 gam=0.9                       ##Gamma value in eqn
