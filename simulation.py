@@ -508,7 +508,7 @@ class CoupledParticle(MFParticle):
             Bgrph = self.BfunSparse(AMFtraj[t],Zcurrdnew)
             
             #Get coupled graph
-            Ucurr = Utraj[:,t]
+            Ucurr = Utraj[:,t+1]
             AMF = np.array((Ucurr < Bgrph))
             AMF = sp.spatial.distance.squareform(AMF)
             AMF = sp.sparse.csr_matrix(AMF,dtype = bool)

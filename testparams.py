@@ -11,13 +11,13 @@ import animate as an
 #Set parameters
 q=49
 nl=3
-m=100
-N=2000
+m=40
+N=30
 SS=10
 t0=1
 noi=0
-ns = [10,20,50,100,200,500,1000]
-T=100
+ns = [10,20]
+T=10
 gam=0.3
 d=2
 C=0.5
@@ -28,7 +28,7 @@ dist=2
 iv=3
 ev=3
 its=100
-rf = "testparams6" #rf is the rfilebase parameter
+rf = "runwv3n10" #rf is the rfilebase parameter
 
 for n in ns:
     #Create Coupled Particle object (this object holds all simulation logic)
@@ -39,19 +39,19 @@ for n in ns:
     #op is a safety parameter.
         #op=0: if safety checks fail, the program will return an error and do nothing
         #op=1: if safety checks fail, the program will override the input parameters in favor of local parameters
-    Present = sl.SimulateSaveLoad("runwv2n"+str(n),rfilebase=rf,cp=cp,op=0,q=q,nl=nl,m=m)
+    Present = sl.SimulateSaveLoad("runwv3n"+str(n),rfilebase=rf,cp=cp,op=0,q=q,nl=nl,m=m)
     
     #Construct reference measure for MF computations if necessary
     #If not necessary, this will return a warning and do nothing
     Present.saveref()
     
     #Run the n particle simulation and coupled MF simulation
-    Present.saveCoupleGivenRef(Present.filebase)
+    Present.saveCoupleGivenRef()
     
     #Get the statistics from m runs of both simulations
     #Optional argument: DEBUG (default: False)
     #DEBUG saves the full particle/network trajectories as well as the statistics. Only use with small parameters!
-    Present.savemCoupledStatistics(Present.filebase)
+    Present.savemCoupledStatistics()
     
     #Create an animation object
     ann = an.Animate(filebase = Present.filebase)
@@ -60,6 +60,6 @@ for n in ns:
     ann.CoupledParticleCloud()          #The full particle cloud
     ann.CoupledParticleCloudBR()        #The particle cloud highlighting the center of mass (in black) and one particle's trajectory (in red)
     #ann.CoupledParticleCloudR()         #The above but without the center of mass
-    ann.AnimateParticleSample(10)         #Animation showing SS particle trajectories
-    ann.AnimateSubNetwork(10)             #Animation showing the subnetwork connecting SS particles
-    ann.AnimateParticleNetworkSample(10)  #Animation combining the two animations above
+    ann.AnimateParticleSample(min(T,10))         #Animation showing SS particle trajectories
+    ann.AnimateSubNetwork(min(T,10))             #Animation showing the subnetwork connecting SS particles
+    ann.AnimateParticleNetworkSample(min(T,10))  #Animation combining the two animations above

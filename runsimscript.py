@@ -18,8 +18,8 @@ import animate as an
 #Set parameters
 q=49
 nl=3
-m=100
-N=3000
+m=101
+N=4000
 SS=10
 t0=1
 noi=0
@@ -35,7 +35,7 @@ dist=2
 iv=3
 ev=3
 its=100
-rf = "MF3000" #rf is the rfilebase parameter
+rf = "runwv2n10N4k" #rf is the rfilebase parameter
 
 #Create Coupled Particle object (this object holds all simulation logic)
 cp = sm.CoupledParticle(N=N,SS=SS,t0=t0,noi=noi,n=n,T=T,gam=gam,d=d,C=C,p=p,a=a\
@@ -48,7 +48,7 @@ cp = sm.CoupledParticle(N=N,SS=SS,t0=t0,noi=noi,n=n,T=T,gam=gam,d=d,C=C,p=p,a=a\
 #op is a safety parameter.
     #op=0: if safety checks fail, the program will return an error and do nothing
     #op=1: if safety checks fail, the program will override the input parameters in favor of local parameters
-Present = sl.SimulateSaveLoad("MF3000",rfilebase=rf,cp=cp,op=0,q=q,nl=nl,m=m)
+Present = sl.SimulateSaveLoad("MF4000",rfilebase=rf,cp=cp,op=0,q=q,nl=nl,m=m)
 
 #Construct reference measure for MF computations if necessary
 #If not necessary, this will return a warning and do nothing
