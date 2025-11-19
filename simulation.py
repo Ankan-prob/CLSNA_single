@@ -7,7 +7,12 @@ Created on Mon May 13 15:09:46 2024
 import numpy as np
 import scipy as sp
 import pickle as pk
-#import itertools as it
+
+###Pausing: Rerun the file to restart the program after each pause
+###Functions that can pause will save data to temporary files which are accessed
+###after the pause is complete.
+###Set cont = False for a fresh implementation of a function, and cont = True to
+###continue a paused implementation
 
 class NParticle:
     ###Global Parameters
@@ -393,11 +398,90 @@ class MFParticle(NParticle):
 
     #Run the simulation
     def simulateMF(self):
-        Ztraj = self.simulate()[1];
+        #Ztraj = self.simulate()[1];
+        Ztraj = self.randWalk();
         for i in np.arange(self.its - 1):
             Ztraj = self.oneiter(Ztraj)
             print(i)
         return Ztraj
+    
+    #Random walk simulation with a bias towards the origin
+    def randWalk(self):
+        #Initialization
+        if self.t0 == 0:
+            Zcurrd = np.zeros((self.d,self.n))
+        elif self.t0 == 1:
+            Zcurrd = np.random.normal(size = (self.d,self.n))
+        else:
+            raise ValueError("self.t0 has an invalid value.")
+    
+        Ztraj = np.zeros((self.d,self.n,self.T))
+        Ztraj[:,:,0] = Zcurrd
+        
+        #Iterate
+        for t in np.arange(self.T-1):
+            if self.noi == 0:
+                noise = np.random.normal(size = (self.d,self.n))
+            elif self.noi == 1:
+                noise = np.zeros((self.d,self.n))
+            else:
+                raise ValueError("self.noi has an invalid value.")
+            Zcurrd = (1 - self.gam)*Zcurrd + noise    
+            Ztraj[:,:,t+1] = Zcurrd
+            
+        return Ztraj
+    
+    #Run he simulation from Random Walk and store all iterations
+    #If cont = False, this is an initialization. If cont = True, the program
+    #is continuing after being paused.
+    def simulateMFStoreIterations(self,cont):
+        if not cont:
+            Zits = np.zeros((self.d,self.n,self.T,self.its))
+            Ztraj = self.randWalk()
+            Zits[:,:,:,0] = Ztraj
+            i = 0
+        else:
+            Zits = np.load("tempMFzits.npy")
+            i = np.load("tempMFi.npy")
+            MFParams = np.load("tempMFparams.npy")
+            Ztraj = Zits[:,:,:,i]
+            self.t0=int(MFParams[0])
+            self.noi=int(MFParams[1])
+            self.n=int(MFParams[2])
+            self.T=int(MFParams[3])
+            self.gam=MFParams[4]
+            self.d=int(MFParams[5])
+            self.C=MFParams[6]
+            self.p=MFParams[7]
+            self.a=MFParams[8]
+            self.delt=MFParams[9]
+            self.dist=MFParams[10]
+            self.iv=int(MFParams[11])
+            self.ev=int(MFParams[12])
+            self.its=int(MFParams[13])
+            
+        while i < self.its-1:
+            try:
+                Ztraj = self.oneiter(Ztraj)
+                Zits[:,:,:,i+1] = Ztraj
+                i = i+1
+                print(i)
+            except KeyboardInterrupt:
+                np.save("tempMFzits.npy",Zits)
+                np.save("tempMFi.npy",i)
+                MFParams = np.array([self.t0,self.noi,self.n,self.T,self.gam,
+                                   self.d,self.C,self.p,self.a,self.delt,
+                                   self.dist,self.iv,self.ev,self.its])
+                np.save("tempMFparams.npy",MFParams)
+                return 
+        return Zits
+    
+    #Given a MF simulation, find all the relevant stats
+    #ref is the file holding Zits
+    #refparams is the file holding the parameters of Zits
+    #def genStats(self, ref):
+        
+    
     
 class CoupledParticle(MFParticle):
     

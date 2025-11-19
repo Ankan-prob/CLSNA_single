@@ -25,10 +25,11 @@ import scipy.stats as stats
 
 #Generate using script.py
 #eb = "runwv2N4kn" #N = 4000
-eb = "runwv2n" #N=3000
+#eb = "runwv2n" #N=3000
 #eb = "runwn" #N=2000
 #eb = "runwv2n1kn" #N = 1000
 #eb = "runwv2n5Hn" #N = 500
+eb = "simit21n" #N=4000
 
 filebase1 = eb + "10"
 filebase2 = eb + "20"
